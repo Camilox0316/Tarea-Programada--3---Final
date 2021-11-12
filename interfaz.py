@@ -83,6 +83,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     global botonExportarCodigo
     global botonReportes 
     global botonCredenciales
+    global label
 
     botonCargarCodigos = Button(ventanaPrincipal,text="1. Cargar Códigos Postales.",command= abrirVentanaCargarCodigos)
     botonCargarCodigos.config(width = "25",fg="white", font= ("Arial", 12,BOLD),bg='#64fa6e')
@@ -480,165 +481,6 @@ def abrirVentanaPdfEtiqueta():
     labelInforme = Label(ventanaEtiqueta, text="Se ha creado el reporte PDF \ncon éxito.")
     labelInforme.pack(padx=20, pady=30)
     labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
-#   -------------------------------------------- VENTANA AGREGAR FRASE -------------------------------------------------
-
-def abrirVentanaAgregarFrase():
-    """
-    Funcionalidad: Al presionar el botón de agregar frase se crea esta ventana, contiene labels y botones 
-    y caja de seleccion que permiten ingresar la información requerida. 
-    Entradas: Na 
-    Salidas: Ventana creada
-    """
-    ventanaAgregarFrase = crearVentana("Agregar frase motivadora")
-    dimensionarVentana(ventanaAgregarFrase, 350, 300)
-    colocarComponentesVentanaAgregarFrase(ventanaAgregarFrase)
-    ventanaAgregarFrase.mainloop()
-
-def colocarComponentesVentanaAgregarFrase(ventanaAgregarFrase):
-    """
-    Funcionalidad: Coloca el label y entry en la ventana de agregar frase 
-    Entradas: VentanaAgregarFrase 
-    Salidas: Na 
-    """
-    labelCarnet = Label(ventanaAgregarFrase, text="Carnet:")
-    labelCarnet.pack(padx=20, pady=10)
-    labelCarnet.config(font=('Helvatical bold', 12), bg = '#6fabaa')
-    entryCarnet = Entry(ventanaAgregarFrase, width=100, justify="center")
-    entryCarnet.config(font=('Helvatical bold', 10))
-    entryCarnet.pack(padx=30, pady=0)
-
-    botonBuscarEstudiante = Button(ventanaAgregarFrase,text="Buscar estudiante", command=lambda: buscarEstudiante(entryCarnet.get(), ventanaAgregarFrase))
-    botonBuscarEstudiante.config(width = "25",fg="black",font= ("Arial", 12))
-    botonBuscarEstudiante.pack(padx=30, pady=20)
-
-def buscarEstudiante(carnet, ventanaAgregarFrase):
-    """
-    Funcionalidad: Busca si el carné ingresado es de un estudiante de la bitacora y le agrega a frase seleccionada
-    Entradas: carnet(str) del estudiante a buscar y la ventana en la que se colocará la información 
-    Salidas: Na, solo inserta la frase en la bitacora 
-    """
-    if validarCedula(carnet):
-        if verificarCarnet(int(carnet)):
-            categorias = []
-            for frase in frases:
-                categorias.append(frase[0])
-            categoriaSeleccionada = StringVar(ventanaAgregarFrase)
-            categoriaSeleccionada.set("Seleccione una categoría")
-
-            fraseSeleccionada = StringVar(ventanaAgregarFrase)
-            fraseSeleccionada.set("Seleccione una frase")
-            cajaSeleccionFrases = OptionMenu(ventanaAgregarFrase, fraseSeleccionada, *frasesMostradas)
-            cajaSeleccionCategoria = OptionMenu(ventanaAgregarFrase, categoriaSeleccionada, *categorias,
-            command=lambda categoriaSeleccionada: actualizarFrasesMostrar(categoriaSeleccionada, cajaSeleccionFrases, fraseSeleccionada))
-            cajaSeleccionCategoria.pack(padx=20, pady=10)
-            cajaSeleccionFrases.pack(padx=20, pady=10)
-
-            botonInsertarFrase = Button(ventanaAgregarFrase,text="Insertar frase", command=lambda:abrirVentanaConfirmarInsertarFrase(carnet,categoriaSeleccionada.get(), fraseSeleccionada.get()))
-            botonInsertarFrase.config(width = "25",fg="black",font= ("Arial", 12))
-            botonInsertarFrase.pack(padx=30, pady=10)
-        else: 
-            abrirVentanaErrorInsertarFrase()
-    else: 
-        abrirVentanaCarneInvalido()
-
-def abrirVentanaErrorInsertarFrase():
-    """
-    Funcionalidad: Crea una ventana que muestra un mensaje de error 
-    Entradas: Na 
-    Salidas: Na 
-    """
-    ventanaErrorInsertarCarne = crearVentanaSecundaria("Error")
-    dimensionarVentana(ventanaErrorInsertarCarne, 400, 100)
-    labelInforme = Label(ventanaErrorInsertarCarne, text= "El carné ingresado no se encuentra registrado.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def abrirVentanaCarneInvalido():
-    """
-    Funcionalidad: Ventana que muestra un mensaje de error. 
-    Entradas: Na 
-    Salidas: ventana creada  
-    """
-    ventanaErrorDeCarnet = crearVentanaSecundaria("Error")
-    dimensionarVentana(ventanaErrorDeCarnet, 400, 100)
-    labelInforme = Label(ventanaErrorDeCarnet, text= "El carné ingresado no cumple con el formato. \naño,sede y 4 numeros.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def abrirVentanaConfirmarInsertarFrase(carnet,categoria,frase):
-    """
-    Funcionalidad: Al ingresar el carnet se habre una ventana para verificar la confirmación 
-    Entradas: Carnet (str) del estudiante a eliminar 
-    Salidas: Na
-    """
-    if validarCarne(carnet): 
-        if verificarCarnet(int(carnet)): 
-            if categoria != "Seleccione una categoría": 
-                if frase != "Seleccione una frase": 
-                    ventanaConfirmarInsertarFrase = crearVentana("Confirmarción")
-                    dimensionarVentana(ventanaConfirmarInsertarFrase, 400, 200)
-
-                    labelConfirmacion = Label(ventanaConfirmarInsertarFrase, text="¿Está usted seguro de que desea agregar la frase?")
-                    labelConfirmacion.pack(padx=20, pady=10)
-                    labelConfirmacion.config(font=('Helvatical bold', 12), bg = '#6fabaa')
-
-                    botonEliminar = Button(ventanaConfirmarInsertarFrase,text="Sí", command=lambda:confirmarInsertar(carnet,categoria,frase))
-                    botonEliminar.config(width = "10",fg="black",font= ("Arial", 12))
-                    botonEliminar.pack(padx=10, pady=20)
-
-                    botonNoEliminar = Button(ventanaConfirmarInsertarFrase,text="No", command=confirmarNoInsertar)
-                    botonNoEliminar.config(width = "10",fg="black",font= ("Arial", 12))
-                    botonNoEliminar.pack(padx=30, pady=20)
-                    ventanaConfirmarInsertarFrase.mainloop() 
-                else: 
-                    fraseInvalida()
-            else: 
-                categoriaInvalida()
-        else: 
-            verificacionInvalida()
-    else: 
-        cedulaInvalida()    
-
-def cedulaInvalida():
-    carneInvalido = crearVentana("Confirmarción")
-    dimensionarVentana(carneInvalido, 350, 110)
-    labelConfirmacion = Label(carneInvalido, text="La cédula no cumple con el formato.\n Porfavor vuelva a intentarlo.")
-    labelConfirmacion.pack(padx=20, pady=10)
-    labelConfirmacion.config(font=('Helvatical bold', 12), bg = '') 
-
-def verificacionInvalida():
-    verificacionInvalida = crearVentana("Confirmarción")
-    dimensionarVentana(verificacionInvalida, 350, 110)
-    labelConfirmacion = Label(verificacionInvalida, text=" El carnet no se encuentra registrado.")
-    labelConfirmacion.pack(padx=20, pady=10)
-    labelConfirmacion.config(font=('Helvatical bold', 12), bg = '#6fabaa')   
-
-def confirmarInsertar(carnet,categoria,frase): 
-    """
-    Funcionalidad: llama a la función de agragarNuevaFrase y abre una ventana que muestra un mensaje de realimentación al usuario de que la frase 
-    se ha insertado. 
-    Entradas: carnet(str): Carnet del estudiante 
-    categoria(str): Categoria seleccionada 
-    frase(str): Frase seleccionada
-    Salidas: Label con mensaje de realimentación.
-    """
-    confirmarInsertarFrase = crearVentana("Éxito")
-    dimensionarVentana(confirmarInsertarFrase, 350, 150)
-    labelInforme = Label(confirmarInsertarFrase, text="Se ha insertado la frase \ncon éxito.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def confirmarNoInsertar(): 
-    """
-    Funcionalidad: Crea una ventana que muestra que no se ha realizado ningún cambio en la BD
-    Entradas: Na 
-    Salidas: Ventana creada con un label
-    """
-    confirmarNoInsertarFrase = crearVentana("Éxito")
-    dimensionarVentana(confirmarNoInsertarFrase, 350, 150)
-    labelInforme = Label(confirmarNoInsertarFrase, text="No se ha insertado la frase.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
 
 #   ---------------------------------------- VENTANA ELIMINAR ESTUDIANTE -------------------------------------------------
 def abrirVentanaEliminarEstudiante():
@@ -682,70 +524,13 @@ def abrirVentanaConfirmacionEliminarEstudiante(ventanaEliminarEstudiante,carnet)
     labelConfirmacion = Label(ventanaConfirmacion, text="¿Desea confirmar la eliminación?")
     labelConfirmacion.pack(padx=20, pady=10)
     labelConfirmacion.config(font=('Helvatical bold', 12), bg = '#6fabaa')
-    botonEliminar = Button(ventanaConfirmacion,text="Sí", command=lambda:abrirVentanaConfirmar(carnet))
+    botonEliminar = Button(ventanaConfirmacion,text="Sí", )
     botonEliminar.config(width = "10",fg="black",font= ("Arial", 12))
     botonEliminar.pack(padx=10, pady=20)
     botonNoEliminar = Button(ventanaConfirmacion,text="No", command=lambda:abrirVentanaNoConfirmar(ventanaConfirmacion))
     botonNoEliminar.config(width = "10",fg="black",font= ("Arial", 12))
     botonNoEliminar.pack(padx=30, pady=20)
     ventanaConfirmacion.mainloop()    
-
-def abrirVentanaDeError(ventanaEliminarEstudiante):
-    """
-    Funcionalidad: Crea una ventana que muestra un mensaje de error si el carné ingresado 
-    no se encuentra registrado.
-    Entradas: Na
-    Salidas: ventana creada
-    """
-    ventanaDeError = crearVentanaSecundaria("No Eliminar")
-    dimensionarVentana(ventanaDeError, 350, 100)
-    labelInforme = Label(ventanaDeError, text="El estudiante con el carné digitado \nno se encuentra registrado.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def abrirVentanaConfirmar(carnet): 
-    """
-    Funcionalidad: Realimenta mostrando una ventana con mensaje de que el estudiante se ha eliminado 
-    Entradas: carnet(str): Carnet del estudiante a eliminar 
-    Salidas: Ventana 
-    """
-    ventanaELiminacion = crearVentanaSecundaria("Eliminar")
-    dimensionarVentana(ventanaELiminacion, 350, 100)
-    if eliminarEstudiante(carnet):
-        LabelVentanaEliminarEstudiante(ventanaELiminacion)         
-        ventanaELiminacion.mainloop()
-
-def abrirVentanaNoConfirmar(ventanaConfirmacion):
-    """
-    Funcionalidad:Crea una ventana que muestra un mensaje de realimentación al usuario 
-    Entradas: Na
-    Salidas: Ventana creada
-    """
-    ventanaNoELiminacion = crearVentanaSecundaria("No Eliminar")
-    dimensionarVentana(ventanaNoELiminacion, 350, 100)
-    labelInforme = Label(ventanaNoELiminacion, text="No se eliminó el estudiante \nde la biácora estudiantil.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def LabelVentanaEliminarEstudiante(ventanaELiminacion):
-    """
-    Funcionalidad: Mensaje de realimentación de que se ha eliminado el estudiante
-    Entradas: ventanaEliminación: ventana en donde se colocará el label 
-    Salidas:Na  
-    """
-    labelInforme = Label(ventanaELiminacion, text="Se ha eliminado el estudiante \ncon éxito.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def LabelVentanaErrorEliminar(ventanaELiminacion):
-    """
-    Funcionalidad: Mensaje de realimentación de que el estudiante no está registrado
-    Entradas: ventanaEliminación: ventana en donde se colocará el label 
-    Salidas:Na  
-    """
-    labelInforme = Label(ventanaELiminacion, text="El estudiante no ha sido encontrado \nen la biácora estudiantil.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
 
 #   ------------------------------------------------- VENTANAS DE REPORTES  -------------------------------------------------
 def abrirVentanaReportes():
