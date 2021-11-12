@@ -11,11 +11,17 @@ Versión:              Python 3.9.6
 ##############################################################
 
 from archivos import *
-
+import re
 ##############################################################
 #####              Definición de Funciones               #####
 ##############################################################
-def pasarDiccionario():
+def crearBDCodigos():
+    """
+    Función: mantiene en memoria los códigos de los distritos
+    Entradas: N/A
+    Salidas:
+    -diccionario(dict): Contiene: {Provincia: {Cantones: {Distritos: Código}}}
+    """
     parchivo = leerTXT("BDPostalCR.txt").splitlines()
     diccionario = {}
     for elemento in parchivo:
@@ -28,29 +34,68 @@ def pasarDiccionario():
         diccionario[provincia][canton].update({actual[-2]: actual[-1]})
     return diccionario
 
-
 def conseguirProvincias(pdict):
+    """
+    Función: Consigue las provincias del archivo
+    Entradas: 
+    -pdict(dict): Es el diccionario a sacar provincias
+    Salidas: La lista con las provincias
+    """
     return pdict.keys()
-def conseguirCantones(pdcit, provincia):
-    return pdcit[provincia].keys()
-def conseguirDistritos(pdict, pcanton, pprovincia):
+    
+def conseguirCantones(pdcit, pprovincia):
+    """
+    Función: Consigue los cantones de la provincia indicada
+    Entradas: 
+    -pdict(dict): Es el diccionario a sacar provincias
+    -pprovincia(str): Es el nombre de la provincia a buscar 
+    Salidas: Lista de los cantones de la provincia indicada
+    """
+    return pdcit[pprovincia].keys()
+
+def conseguirDistritos(pdict, pprovincia, pcanton):
+    """
+    Función: Consigue el nombre de los distritos de un canton indicado
+    Entradas:
+    -pdict(dict): Es el diccionario a sacar provincias
+    -pprovincia(str): Es el nombre de la provincia a buscar 
+    -pcanton(str): es le canton a sacar distritos
+    Salidas: Lista de los distritos del canton indicado
+    """
     return pdict[pprovincia][pcanton].keys()
 
 def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
+    """
+    Función: Consigue el codigo postal de un distrito
+    Entradas: 
+    -pdict(dict): Es el diccionario a sacar provincias
+    -pprovincia(str): Es el nombre de la provincia a buscar 
+    -pcanton(str): es le canton a sacar distritos
+    Salidas: Es el código del distrito
+    """
     return pdict[pprovincia][pcanton][pdistrito]
 
+def validarNombre(pnombre):
+    """
+    Función:    Determina si el valor ingresado coincide con el formato de nombre , no permite números
+    Entradas:
+        -pnombre(str):  Es el nombre a verificar si cumple con el formato
+    Salidas:
+        -Retorna None y False para formato y caractéres inválidos, pnombre si es válido
+    """
+    pnombre = tuple(pnombre.split())
+    if not len(pnombre) == 3:
+        return None
+    for nombre in pnombre:
+        if not re.match("^[a-zA-ZáéíóúÁÉÍÓÚ]{3,}$", nombre):
+            return False
+    return pnombre
+
 def crearCodigosPostales():
-    diccionario = pasarDiccionario()
+    diccionario = crearBDCodigos()
     matriz = []
     for indice, llave in enumerate(diccionario.keys()):
         matriz.append([llave]) # [[san jose, []]]
         for canton, distrito in diccionario[llave].items():
             matriz[indice].append([canton, distrito]) 
     return matriz
-
-
-BD = pasarDiccionario()
-"""
-Se va a pedir el codigo de San José -> Santa Ana -> Piedades; el cual es: 10905
-"""
-print(f'Y el código postal es: {conseguirCodigo(BD, "San José", "Santa Ana", "Piedades")}')
