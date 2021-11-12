@@ -11,11 +11,14 @@ Versión:              Python 3.9.6
 ##############################################################
 
 from archivos import *
+import re
 
 ##############################################################
 #####              Definición de Funciones               #####
 ##############################################################
-def pasarDiccionario():
+
+############################################### Cargar Códigos ##################################################
+def crearBDCodigos():
     parchivo = leerTXT("BDPostalCR.txt").splitlines()
     diccionario = {}
     for elemento in parchivo:
@@ -27,7 +30,6 @@ def pasarDiccionario():
             diccionario[provincia].update({canton: {}})  
         diccionario[provincia][canton].update({actual[-2]: actual[-1]})
     return diccionario
-
 
 def conseguirProvincias(pdict):
     return pdict.keys()
@@ -48,9 +50,59 @@ def crearCodigosPostales():
             matriz[indice].append([canton, distrito]) 
     return matriz
 
-
 BD = pasarDiccionario()
 """
 Se va a pedir el codigo de San José -> Santa Ana -> Piedades; el cual es: 10905
 """
-print(f'Y el código postal es: {conseguirCodigo(BD, "San José", "Santa Ana", "Piedades")}')
+#print(f'Y el código postal es: {conseguirCodigo(BD, "San José", "Santa Ana", "Piedades")}')
+#print(conseguirProvincias(BD))
+#print('--------------------------------------------------')
+#print(conseguirCantones(BD,'Alajuela'))
+# #print(list(conseguirCantones(BD,'Puntarenas')))
+#print('--------------------------------------------------')
+#print(conseguirDistritos(BD,'San Ramón','Alajuela'))
+
+
+########################################### Validaciones ################################################
+def validarNombre(nombre):
+    """
+    Funcionalidad: Valida que se ingrese un nombre, sin numeros ni caracteres
+    Entradas: nombre(str): Nombre a validar 
+    Salidas: Booleano 
+    """
+    if re.match('^[a-zA-Z]{1,}\s{1}[a-zA-Z]{1,}\s{1}[a-zA-Z]{1,}$',nombre):
+        return True
+    return False
+
+def validarCedula(cedula):
+    """
+    Funcionalidad: Valida que se ingrese una cedula formato correcto
+    Entradas: nombre(str): Nombre a validar 
+    Salidas: Booleano 
+    """
+    if re.match('^[1-9]{1}\d{4}0{1}\d{3}$',cedula):
+        return True
+    return False
+def verificarArchivo(nombreArchivo): 
+    """
+    Funcionalidad: verifica si el archivo existe
+    Entradas: nombre de archivo
+    Salidas: Bool
+    """
+    return leerTXT(nombreArchivo) == ""
+def verificarCedula(carnet): 
+    """
+    Funcionalidad: Verifica si hay una cedula repetida
+    Entradas: carnet
+    Salidas: booleano
+    """
+    lista = list(lee(""))#lee el archivo de las personas que esten registradas
+    for elem in lista: 
+        if carnet == elem[0]: 
+            return True 
+    return False 
+def validarCodigoPostal(codigo):
+    # crearFuncion que Haga una lista de Todos los códigos postales esta funcion tiene que validar
+    # si existen códigos o no cumplen el formato
+    lista = []
+    return codigo in lista

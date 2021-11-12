@@ -10,7 +10,7 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
-
+import pickle
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -42,3 +42,31 @@ def leerTXT(filePath):
         return resultado
     except:
         return ""
+        
+def lee (nomArchLeer):
+    """
+    F: lee archivo
+    E: str nombrede archivo
+    S: retorna la lista
+    """
+    lista=[]
+    try:
+        f=open(nomArchLeer,"rb")
+        dicc = pickle.load(f)
+        f.close()
+        return dicc
+    except:
+        return lista
+
+def graba(nomArchGrabar,lista):
+    """
+    F: crea archivo
+    E: str y lo que desee añadir a lista
+    S: N/A
+    """
+    try:
+        f = open(nomArchGrabar,"wb")
+        pickle.dump(lista,f)
+        f.close()
+    except:
+        return ''
