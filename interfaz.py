@@ -169,7 +169,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     #    botonEliminarEstudiante.config(state = NORMAL)
     #    botonReportes.config(state = NORMAL)
 
-#   ------------------------------------------------- VENTANA Cargar Códigos -------------------------------------------------
+#   -------------------------------------------- VENTANA CARGAR CODIGOS -------------------------------------------------
 
 def abrirVentanaCargarCodigos():
     """
@@ -346,7 +346,7 @@ def abrirVentanaPdfEtiqueta():
     Entradas: Na 
     Salidas: reporte pdf 
     """
-    ventanaEtiqueta = crearVentana("Reporte PDF")
+    ventanaEtiqueta = crearVentanaSecundaria("Reporte PDF")
     dimensionarVentana(ventanaEtiqueta, 350, 160)
     # Meter una función que haga la etiqueta
     labelInforme = Label(ventanaEtiqueta, text="Se ha creado el reporte PDF \ncon éxito.")
@@ -519,7 +519,7 @@ def abrirVentanaCredenciales():
     Entradas: Na 
     Salidas: N/A
     """
-    ventanaCredencial = crearVentana("Reporte Excel")
+    ventanaCredencial = crearVentanaSecundaria("Reporte Excel")
     dimensionarVentana(ventanaCredencial, 350, 160)
     # Crear Función que muestre credenciales
     labelInforme = Label(ventanaCredencial, text="Las credenciales estan listas.")
