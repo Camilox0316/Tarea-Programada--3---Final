@@ -12,9 +12,13 @@ Versión:              Python 3.9.6
 
 from archivos import *
 import re
+
 ##############################################################
 #####              Definición de Funciones               #####
 ##############################################################
+####################################
+#         Lectura de códigos       #
+####################################
 def crearBDCodigos():
     """
     Función: mantiene en memoria los códigos de los distritos
@@ -74,7 +78,9 @@ def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
     Salidas: Es el código del distrito
     """
     return pdict[pprovincia][pcanton][pdistrito]
-
+####################################
+#             Validaciones         #
+####################################
 def validarNombre(pnombre):
     """
     Función:    Determina si el valor ingresado coincide con el formato de nombre , no permite números
@@ -90,6 +96,28 @@ def validarNombre(pnombre):
         if not re.match("^[a-zA-ZáéíóúÁÉÍÓÚ]{3,}$", nombre):
             return False
     return pnombre
+
+def validarFormatoCorreo(pcorreo):
+    """
+    Funcionamiento: valida que el correo ingresado tenga formato correcto, y que además el correo exista previamente
+    Entradas:
+    -pcorreo(str): es el correo a validar
+    Salidas:
+    """
+    if re.match("^[a-z\d]+[\._]?[a-z\d]+[@]\w+[.]\w{2,}$", pcorreo):
+        return pcorreo
+    return False
+####################################
+#        Utilidades extras         #
+####################################
+def mostrarNombreCliente(ptupla):
+    """
+    Función: Da el nombre de un cliente a partir de su tupla
+    Entradas: 
+    -ptupla(tuple): Es la tupla que contiene el nombre del cliente
+    Salidas: Str(); el nombre del usuario
+    """
+    return f"{ptupla[0]} {ptupla[1]} {ptupla[2]}"
 
 def crearCodigosPostales():
     diccionario = crearBDCodigos()
