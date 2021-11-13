@@ -262,8 +262,7 @@ def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
         cajaSeleccionDistrito = OptionMenu(ventanaInsertarCliente, DistritoSeleccionado, *Distritos)
         cajaSeleccionDistrito.pack(padx=20, pady=30)
 
-        botonInsertarEstudiante = Button(ventanaInsertarCliente,text="Insertar Estudiante", 
-        command=lambda:abrirVentanaLabelInsertarEtudiante(entryCedula.get(),entryNombre.get(),ProvinciaSeleccionada.get(), CantonSeleccionado.get(), DistritoSeleccionado.get()))
+        botonInsertarEstudiante = Button(ventanaInsertarCliente,text="Insertar Estudiante")
         botonInsertarEstudiante.config(width = "25",fg="black",font= ("Arial", 12))
         botonInsertarEstudiante.pack(padx=30, pady=0)
     except:
