@@ -5,6 +5,7 @@ from tkinter import *
 from tkinter.font import BOLD
 from funciones import *
 from archivos import *
+from tkinter import messagebox, ttk
 
 ############################
 #    Variables globales    # 
@@ -40,7 +41,6 @@ def crearVentanaSecundaria(titulo):
     ventanaSecundaria.config(bg = '#153a7a')
     ventanaSecundaria.iconbitmap('icon.ico')
     return ventanaSecundaria  
-
 def dimensionarVentana(ventana, anchoVentana, altoVentana):
     """
     Funcionalidad: Ajusta el tamaño de la ventana según las medidas dadas
@@ -55,7 +55,33 @@ def dimensionarVentana(ventana, anchoVentana, altoVentana):
     posicionVentanaX = (anchoPantalla/2) - (anchoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje X
     posicionVentanaY = (altoPantalla/2) - (altoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje Y
     ventana.geometry('%dx%d+%d+%d' % (anchoVentana,altoVentana,posicionVentanaX,posicionVentanaY))
-
+def mostrarError(pventana, pmensaje):
+    """
+    Función:    Despliega interfaz con mensaje de error
+    Entradas:
+        pventana (tkinter.Tk)   - Ventana de origen del mensaje
+        pmensaje (str)          - Mensaje de error a mostrar
+    Salidas:    Retorna objeto (dialogo de error)
+    """
+    return messagebox.showerror(title="Error", message = pmensaje, parent = pventana)
+def mostrarInfo(pventana, pmensaje):
+    """
+    Función:    Despliega interfaz con información para usuario
+    Entradas:
+        pventana (tkinter.Tk)   - Ventana de origen del mensaje
+        pmensaje (str)          - Mensaje de error a mostrar
+    Salidas:    Retorna objeto (dialogo de información)
+    """
+    return messagebox.showinfo(title="Atención", message=pmensaje, parent=pventana)
+def confirmarTk(pventana, pmensaje):
+    """
+    Función:    Despliega interfaz con pregunta a usuario
+    Entradas:
+        pventana (tkinter.Tk)   - Ventana de origen del mensaje
+        pmensaje (str)          - Mensaje de pregunta a mostrar
+    Salidas:    Retorna True si se acepta, False si se cancela
+    """
+    return messagebox.askokcancel(title="Atención", message=pmensaje, parent=pventana)
 #   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
 
 def iniciarInterfaz():
@@ -93,12 +119,12 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     botonRegistrarCliente.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
     botonRegistrarCliente.pack(padx=30, pady=10)
 
-    botonInsertarClientes = Button(ventanaPrincipal,text="3. Crear Clientes.", command=abrirVentanaLabelInsertarClientes)
+    botonInsertarClientes = Button(ventanaPrincipal,text="3. Crear Clientes.", command=abrirVentanaRegistrarClientes)
     botonInsertarClientes.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
     botonInsertarClientes.pack(padx=30, pady=10)
 
     botonEtiqueta = Button(ventanaPrincipal,text="4. Generar Etiquieta.", command='')
-    botonEtiqueta.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
+    botonEtiqueta.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e',command=abrirVentanaPdfEtiqueta)
     botonEtiqueta.pack(padx=30, pady=10)
 
     botonCorreo = Button(ventanaPrincipal,text="5. Enviar Correo.", command='')
@@ -181,10 +207,10 @@ def abrirVentanaIngresarCliente():
     """
     ventanaInsertarCliente = crearVentanaSecundaria("Insertar estudiante")
     dimensionarVentana(ventanaInsertarCliente,350,500)
-    colocarComponentesVentanaInsertarEstudiante(ventanaInsertarCliente)
+    colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
     ventanaInsertarCliente.mainloop()
 
-def colocarComponentesVentanaInsertarEstudiante(ventanaInsertarCliente):
+def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     """
     Funcionalidad: Coloca los componentes(cajas de texto,labels, caja de seleccion) en la ventana
     de insertar estudiante.
@@ -204,7 +230,7 @@ def colocarComponentesVentanaInsertarEstudiante(ventanaInsertarCliente):
     entryNombre = Entry(ventanaInsertarCliente, width=100, justify="center")
     entryNombre.config(font=('Helvatical bold', 10))
     entryNombre.pack(padx=30, pady=0)
-    try: 
+    try:
         Provincias =  conseguirProvincias(dicBD)
         ProvinciaSeleccionada = StringVar(ventanaInsertarCliente) #StrVar declara una variable de tipo cadena
         ProvinciaSeleccionada.set("Seleccione una Provincia:")
@@ -228,25 +254,8 @@ def colocarComponentesVentanaInsertarEstudiante(ventanaInsertarCliente):
         command=lambda:abrirVentanaLabelInsertarEtudiante(entryCedula.get(),entryNombre.get(),ProvinciaSeleccionada.get(), CantonSeleccionado.get(), DistritoSeleccionado.get()))
         botonInsertarEstudiante.config(width = "25",fg="black",font= ("Arial", 12))
         botonInsertarEstudiante.pack(padx=30, pady=0)
-    except: 
-        mostrarLabelError()
-
-def insertarEstudiante(carnet, nombre,categoria, frase, grupo):
-    """
-    Funcionalidad: Inserta un estudiante con todos los datos en la bitacora estudiantil
-    Entradas: carnet(str): del estudiante
-    nombre(str): Nombre del estudiante 
-    categoria(str): categoria seleccionada
-    frase(str): frase de la categoría seleccionada 
-    grupo(str): Grupo en el que se va a ubicar el estudiante. 
-    Salidas: Na 
-    """
-    lista = list(lee('bitacora estudiantil'))
-    if validarCedula(str(carnet)):
-        if validarNombre(nombre):
-            lista.append([int(carnet),tuple(nombre.split()), [deFraseATupla(categoria, frase)], int(grupo)])
-            graba('bitacora estudiantil',lista)
-            print([int(carnet),tuple(nombre.split()),[frase], int(grupo)])
+    except:
+        mostrarError(ventanaInsertarCliente,'Error')
           
 def abrirVentanaLabelInsertarEtudiante(carnet, nombre,categoria, frase, grupo):
     """
@@ -260,101 +269,8 @@ def abrirVentanaLabelInsertarEtudiante(carnet, nombre,categoria, frase, grupo):
     """
     ventanaLabelInsertarEstudiante = crearVentanaSecundaria("Insertar un Estudiante")
     dimensionarVentana(ventanaLabelInsertarEstudiante, 350, 250)
-    if validarCarne(carnet):
-        if not verificarCarnet(int(carnet)):
-            if validarNombre(nombre):
-                if categoria != "Seleccione una categoría": 
-                    if frase != "Seleccione una frase": 
-                        if grupo != "Seleccione un grupo": 
-                            insertarEstudiante(carnet, nombre,categoria, frase, grupo)
-                            confirmacionEstudianteInsertado(ventanaLabelInsertarEstudiante,ventanaLabelInsertarEstudiante)                        
-                        else: 
-                            labelGrupoInvalido(ventanaLabelInsertarEstudiante)
-                    else:
-                        labelFraseInvalida(ventanaLabelInsertarEstudiante)
-                else:
-                    labelCategoriaInvalida(ventanaLabelInsertarEstudiante)
-            else:
-                labelNombreInvalido(ventanaLabelInsertarEstudiante)
-        else: 
-            labelCarneRepetido(ventanaLabelInsertarEstudiante)
-    else: 
-        labelCarnetInvalido(ventanaLabelInsertarEstudiante)
+    insertarEstudiante(carnet, nombre,categoria, frase, grupo)
     ventanaLabelInsertarEstudiante.mainloop()
-
-def confirmacionEstudianteInsertado(ventanaLabelInsertarEstudiante,ventanaInsertarEstudiante):
-    """
-    Funcionalidad: Muestra una pequeña ventana indicando un mensaje de que se ha insertado el estudiante correctamente
-    Entradas: Ventana insertar Estudiante 
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text="Se ha insertado el estudiante \nen la bitácora estudiantil'")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-    botonOk = Button(ventanaLabelInsertarEstudiante,text="Ok", command =ventanaLabelInsertarEstudiante.destroy )
-    botonOk.config(width = "25",fg="black",font= ("Arial", 12))
-    botonOk.pack(padx=30, pady=20)
-
-def labelCarnetInvalido(ventanaLabelInsertarEstudiante):
-    """
-    Funcionalidad: Muestra un mensaje indicando que el carnet no es válido.
-    Entradas: ventanaLabelInsertarEstudiante 
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text= "El carné no cumple con el formato: \n 202100####, significa: año, sede y aleatorio")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def labelNombreInvalido(ventanaLabelInsertarEstudiante):
-    """
-    Funcionalidad: indica un mensaje de que el nombre es invalido 
-    Entradas: ventanaLabelInsertarEstudiante 
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text= "Debe ingresar el nombre completo \n (Nombre Apellido1 Apellido2)")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def labelCategoriaInvalida(ventanaLabelInsertarEstudiante):
-    """
-    Funcionalidad: Indica un mensaje de eror si no se selecciona la categoría
-    Entradas: ventanaLabelInsertarEstudiante
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text= "Debe seleccionar una categoría. ")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def labelFraseInvalida(ventanaLabelInsertarEstudiante):
-    """
-    Funcionalidad: Indica un mensaje de error si no se selecciona la frase.
-    Entradas:ventanaLabelInsertarEstudiante
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text= "Debe seleccionar una frase")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def labelGrupoInvalido(ventanaLabelInsertarEstudiante):
-    """
-    Funcionalidad: Muestra un mensaje de error, si no se selecciona el grupo
-    Entradas: Ventana insertar Estudiante 
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text= "Debe seleccionar un grupo.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-
-def labelCarneRepetido(ventanaLabelInsertarEstudiante):
-    """
-    Funcionalidad: Indica un mensaje de error si el carné ya se encuentra registrado previamente.
-    Entradas: Ventana insertar Estudiante 
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaLabelInsertarEstudiante, text= "El carnet ya se encuentra registrado.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
 
 def actualizarFrasesMostrar(provincia, cajaSeleccionFrases, cantones):
     """
@@ -423,51 +339,9 @@ def abrirVentanaLabelInsertarClientes(cantidadClientes):
     """
     ventanaInsertarLabelClientes = crearVentanaSecundaria("Cantidad de Clientes")
     dimensionarVentana(ventanaInsertarLabelClientes, 400, 100)
-    if verificarArchivo("BDPostalCR.txt"):    
-        if insertarClientes(cantidadClientes): 
-            LabelInsertarClientes(ventanaInsertarLabelClientes)
-        else: 
-            LabelNoInsertarClientes(ventanaInsertarLabelClientes)
-    else: 
-        LabelExtisteBD(ventanaInsertarLabelClientes)
+    insertarClientes(cantidadClientes)
     ventanaInsertarLabelClientes.mainloop()
 
-def mostrarLabelError():
-    ventanaError = crearVentanaSecundaria("Insertar un Estudiante")
-    dimensionarVentana(ventanaError, 350, 250)
-    labelInforme = Label(ventanaError, text="Favor reiniciar el programa.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
-
-def LabelExtisteBD(ventanaInsertarClientes):
-    """
-    Funcionalidad: Muestra una pequeña ventana indicando un mensaje de que se han almacenado las frases en la BD 
-    Entradas: VentanaExtraerFrases
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaInsertarClientes, text="Ya se encuentra una bitacora  \nregistrada.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(fg='white',font=('Helvatical bold', 13), bg = '#153a7a')
-
-def LabelInsertarClientes(ventanaInsertarLabelGrupos):
-    """
-    Funcionalidad: Muestra una pequeña ventana indicando un mensaje de que se han almacenado las frases en la BD 
-    Entradas: VentanaExtraerFrases
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaInsertarLabelGrupos, text="Se han añadido \nlos clientes.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(fg='white',font=('Helvatical bold', 13), bg = '#153a7a')
-
-def LabelNoInsertarClientes(ventanaInsertarLabelGrupos):
-    """
-    Funcionalidad: Muestra una pequeña ventana indicando un mensaje de que se han almacenado las frases en la BD 
-    Entradas: VentanaExtraerFrases
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaInsertarLabelGrupos, text="Ingrese valores númericos \nlos grupos deben ser mayor a 0.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(fg='white',font=('Helvatical bold', 13), bg = '#153a7a')
 ############################################## ETIQUIETA  ###############################################
 def abrirVentanaPdfEtiqueta():
     """
@@ -494,7 +368,6 @@ def abrirVentanaEliminarEstudiante():
     dimensionarVentana(ventanaEliminarEstudiante, 350, 300)
     colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante)
     ventanaEliminarEstudiante.mainloop()
-
 def colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante):
     """
     Funcionalidad: Se colocan los componentes (entry y botón) en la ventana de eliminar estudiante 
@@ -508,29 +381,9 @@ def colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante):
     entryCarnet.config(font=('Helvatical bold', 10))
     entryCarnet.pack(padx=30, pady=0)
 
-    botonEliminarEstudiante = Button(ventanaEliminarEstudiante,text="Buscar estudiante", command=lambda: abrirVentanaConfirmacionEliminarEstudiante(ventanaEliminarEstudiante,entryCarnet.get()))
+    botonEliminarEstudiante = Button(ventanaEliminarEstudiante,text="Buscar estudiante")
     botonEliminarEstudiante.config(width = "25",fg="black",font= ("Arial", 12))
     botonEliminarEstudiante.pack(padx=30, pady=20)
-
-def abrirVentanaConfirmacionEliminarEstudiante(ventanaEliminarEstudiante,carnet):
-    """
-    Funcionalidad: Al ingresar el carnet y presionar el boton de buscar estudiante 
-    se habre una ventana para verificar la confirmación 
-    Entradas: Carnet (str) del estudiante a eliminar 
-    Salidas: Na
-    """
-    ventanaConfirmacion = crearVentana("")
-    dimensionarVentana(ventanaConfirmacion, 350, 200)
-    labelConfirmacion = Label(ventanaConfirmacion, text="¿Desea confirmar la eliminación?")
-    labelConfirmacion.pack(padx=20, pady=10)
-    labelConfirmacion.config(font=('Helvatical bold', 12), bg = '#6fabaa')
-    botonEliminar = Button(ventanaConfirmacion,text="Sí", )
-    botonEliminar.config(width = "10",fg="black",font= ("Arial", 12))
-    botonEliminar.pack(padx=10, pady=20)
-    botonNoEliminar = Button(ventanaConfirmacion,text="No", command=lambda:abrirVentanaNoConfirmar(ventanaConfirmacion))
-    botonNoEliminar.config(width = "10",fg="black",font= ("Arial", 12))
-    botonNoEliminar.pack(padx=30, pady=20)
-    ventanaConfirmacion.mainloop()    
 
 #   ------------------------------------------------- VENTANAS DE REPORTES  -------------------------------------------------
 def abrirVentanaReportes():
@@ -550,7 +403,7 @@ def colocarBotonesVentanaReportes(ventanaReportes):
     Entradas: VentanaReportes 
     Salidas:Na
     """
-    botonProvincia = Button(ventanaReportes,text="Por grupo", command=abrirVentanaReportesProvincia)
+    botonProvincia = Button(ventanaReportes,text="Por Provincia", command=abrirVentanaReportesProvincia)
     botonProvincia.config(width = "25",fg="black",font= ("Arial", 12),bg='white')
     botonProvincia.pack(padx=30, pady=10)
 
@@ -572,28 +425,28 @@ def abrirVentanaReportesProvincia():
     Entradas: Na 
     Salidas:Ventana 
     """
-    global Provincias
     try:
-        ventanaReportesPorGrupo = crearVentana("Reportes por Provincia")
-        dimensionarVentana(ventanaReportesPorGrupo, 350, 110)
-        grupoSeleccionado = StringVar(ventanaReportesPorGrupo)
+        Provincias =  conseguirProvincias(dicBD)
+        ventanaReportesProvincia = crearVentanaSecundaria("Reportes por Provincia")
+        dimensionarVentana(ventanaReportesProvincia, 350, 110)
+        grupoSeleccionado = StringVar(ventanaReportesProvincia)
         grupoSeleccionado.set("Seleccione una Provincia")
-        cajaSeleccionProvincia = OptionMenu(ventanaReportesPorGrupo, grupoSeleccionado, *grupos)
+        cajaSeleccionProvincia = OptionMenu(ventanaReportesProvincia, grupoSeleccionado, *Provincias)
         cajaSeleccionProvincia.pack(padx=20, pady=10)
         #cajaSeleccionGrupo.pack(padx=20, pady=10)
-        botonGenerar = Button(ventanaReportesPorGrupo,text="Generar", command=lambda:generarReportePorClientesProvincia(grupoSeleccionado.get()))
+        botonGenerar = Button(ventanaReportesProvincia,text="Generar", command=lambda:generarReportePorClientesProvincia(grupoSeleccionado.get()))
         botonGenerar.config(width = "25",fg="black",font= ("Arial", 12))
         botonGenerar.pack(padx=30, pady=10)
-        ventanaReportesPorGrupo.mainloop()
+        ventanaReportesProvincia.mainloop()
     except: 
-        mostrarLabelError()
+         mostrarError(ventanaReportesProvincia,'Error')
 def generarReportePorClientesProvincia(grupoSeleccionado):
     """
     Funcionalidad: Dado la provincia este genera el reporte HTML 
     Entradas: Provincia(str)
     Salidas: reporte html 
     """
-    ventanaReportesProvincia = crearVentana("Reporte html por Categoría")
+    ventanaReportesProvincia = crearVentanaSecundaria("Reporte Cliente")
     dimensionarVentana(ventanaReportesProvincia, 350, 110)
     if grupoSeleccionado != "Seleccione una Provincia": # va a ser la provincia
         # Genera html de los clientes de una provincia 
@@ -612,33 +465,27 @@ def abrirVentanaReporteCliente():
     Entradas: Na
     Salidas: ventana 
     """
-    ventanaReporteCliente = crearVentana("Reportes por categoría de frase")
+    ventanaReporteCliente = crearVentanaSecundaria("Reportes por categoría de frase")
     dimensionarVentana(ventanaReporteCliente, 350, 110)
     entryCedula = Entry(ventanaReporteCliente, width=100, justify="center")
     entryCedula.config(font=('Helvatical bold', 10))
     entryCedula.pack(padx=30, pady=0)
 
-    botonGenerar = Button(ventanaReporteCliente,text="Generar", command=lambda:generarReportePorCliente(entryCedula.get()))
+    botonGenerar = Button(ventanaReporteCliente,text="Generar", command=lambda:generarReportePorCliente(entryCedula.get(),ventanaReporteCliente))
     botonGenerar.config(width = "25",fg="black",font= ("Arial", 12))
     botonGenerar.pack(padx=30, pady=10)
     ventanaReporteCliente.mainloop()
-def generarReportePorCliente(categoriaSeleccionada):
+def generarReportePorCliente(cedulaSeleccionada,ventanaReporteCliente):
     """
     Funcionalidad: Dada la cedula se crea un html de cliente específico
     Entradas: categoria Seleccionada(str)
     Salidas: reporte html 
     """
-    ventanaReporteCliente = crearVentana("Reporte html por Categoría")
-    dimensionarVentana(ventanaReporteCliente, 420, 110)
-    if validarCedula(categoriaSeleccionada):
+    if validarCedula(cedulaSeleccionada):
         # Función que genere html de cliente especifico meterla en esta linea
-        labelInforme = Label(ventanaReporteCliente, text=f"Se ha creado el reporte de:\n{categoriaSeleccionada}")
-        labelInforme.pack(padx=20, pady=30)
-        labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7aa')
+        mostrarInfo(ventanaReporteCliente,f"Se ha creado el reporte de la persona:\n{cedulaSeleccionada}")#Promete función que pase de cedula a persona
     else: 
-        labelInforme = Label(ventanaReporteCliente, text="Error, cedula con formato incorrecto.")
-        labelInforme.pack(padx=20, pady=30)
-        labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
+        mostrarError(ventanaReporteCliente,"Error, cédula con formato incorrecto.\nO no existente")
 ##########################################   Reporte 3    #############################################
 def abrirVentanaReporteCodigos():
     """
@@ -646,87 +493,28 @@ def abrirVentanaReporteCodigos():
     Entradas: Na
     Salidas: ventana 
     """
-    ventanaReporteCodigo = crearVentana("Reportes por código")
+    ventanaReporteCodigo = crearVentanaSecundaria("Reportes por código")
     dimensionarVentana(ventanaReporteCodigo, 350, 110)
     entryCodigo = Entry(ventanaReporteCodigo, width=100, justify="center")
     entryCodigo.config(font=('Helvatical bold', 10))
     entryCodigo.pack(padx=30, pady=0)
 
-    botonGenerar = Button(ventanaReporteCodigo,text="Generar", command=lambda:generarReporteCodigos(entryCodigo.get()))
+    botonGenerar = Button(ventanaReporteCodigo,text="Generar", command=lambda:generarReporteCodigos(entryCodigo.get(),ventanaReporteCodigo))
     botonGenerar.config(width = "25",fg="black",font= ("Arial", 12))
     botonGenerar.pack(padx=30, pady=10)
     ventanaReporteCodigo.mainloop()
-def generarReporteCodigos(categoriaSeleccionada):
+def generarReporteCodigos(codigoSeleccionado,ventanaReporteCliente):
     """
     Funcionalidad: Dado el codigo postal se crea un html de clientes
     Entradas: Codigo Seleccionada(str)
     Salidas: reporte html 
     """
-    ventanaReporteCliente = crearVentana("Reporte html por Categoría")
-    dimensionarVentana(ventanaReporteCliente, 420, 110)
-    if validarCodigoPostal(categoriaSeleccionada):
+    if validarCodigoPostal(codigoSeleccionado):
         # Función que genere html de cliente especifico meterla en esta linea
-        labelInforme = Label(ventanaReporteCliente, text=f"Se ha creado el reporte del código:\n{categoriaSeleccionada}")
-        labelInforme.pack(padx=20, pady=30)
-        labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7aa')
+        mostrarInfo(ventanaReporteCliente,f"Se ha creado el reporte del código:\n{codigoSeleccionado}")
     else: 
-        labelInforme = Label(ventanaReporteCliente, text="Error, código con formato incorrecto.\nO código no existente")
-        labelInforme.pack(padx=20, pady=30)
-        labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
-#def abrirVentanaReportesPorCategoriaFrase():
-#    """
-#    Funcionalidad: Crea una ventana que contiene cajas de selección para ingresar la categoría 
-#    y en base a ello, la frase que se quiere para generar el reporte.
-#    Entradas: Na 
-#    Salidas: ventana 
-#    """
-#    ventanaReportesFrase = crearVentana("Reportes por categoría y frase")
-#    dimensionarVentana(ventanaReportesFrase, 350, 160)
-#    categorias = []
-#    for frase in frases:
-#        categorias.append(frase[0])
-#    categoriaSeleccionada = StringVar(ventanaReportesFrase)
-#    categoriaSeleccionada.set("Seleccione una categoría")
-#
-#    fraseSeleccionada = StringVar(ventanaReportesFrase)
-#    fraseSeleccionada.set("Seleccione una frase")
-#    cajaSeleccionFrases = OptionMenu(ventanaReportesFrase, fraseSeleccionada, *frasesMostradas)
-#    cajaSeleccionCategoria = OptionMenu(ventanaReportesFrase, categoriaSeleccionada, *categorias, 
-#    command=lambda categoriaSeleccionada: actualizarFrasesMostrar(categoriaSeleccionada, cajaSeleccionFrases, fraseSeleccionada))
-#    cajaSeleccionCategoria.pack(padx=20, pady=10)
-#    cajaSeleccionFrases.pack(padx=20, pady=10)
-#
-#    botonGenerar = Button(ventanaReportesFrase,text="Generar", command=lambda:generarReportePorCategoriaFrase(categoriaSeleccionada.get(), fraseSeleccionada.get()))
-#    botonGenerar.config(width = "25",fg="black",font= ("Arial", 12))
-#    botonGenerar.pack(padx=30, pady=10)
-
-#def generarReportePorCategoriaFrase(categoriaSeleccionada, fraseSeleccionada):
-#    """
-#    Funcionalidad: Genera el reporte html de la frase 
-#    Entradas: categoriaSeleccionada, fraseSeleccionada (str)
-#    Salidas: Reporte html 
-#    """
-#    try:
-#        ventanaReportesPorCategoriaFrase = crearVentana("Reporte html por Categoría")
-#        dimensionarVentana(ventanaReportesPorCategoriaFrase, 400, 110)
-#        if categoriaSeleccionada != "Seleccione una categoría": 
-#            if fraseSeleccionada != "Seleccione una frase":
-#                generarHtmlCategoriaFrase(categoriaSeleccionada, fraseSeleccionada)
-#                labelInforme = Label(ventanaReportesPorCategoriaFrase, text=f"Se ha creado el reporte HTML de la frase: \n{fraseSeleccionada} ,con éxito.")
-#                labelInforme.pack(padx=20, pady=30)
-#                labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-#            else: 
-#                labelInforme = Label(ventanaReportesPorCategoriaFrase, text="Debe seleccionar una frase.")
-#                labelInforme.pack(padx=20, pady=30)
-#                labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-#        else: 
-#            labelInforme = Label(ventanaReportesPorCategoriaFrase, text="Debe seleccionar una categoría.")
-#            labelInforme.pack(padx=20, pady=30)
-#            labelInforme.config(font=('Helvatical bold', 13), bg = '#6fabaa')
-#    except:
-#        mostrarLabelError()
-#
-
+        mostrarError(ventanaReporteCliente,"Error, código con formato incorrecto.\nO código no existente")
+        
 ########################################### CREDENCIALES ##################################################
 def abrirVentanaCredenciales():
     """
