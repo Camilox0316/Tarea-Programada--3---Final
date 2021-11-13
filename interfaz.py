@@ -194,8 +194,6 @@ def colocarLabelVentanaCargarCodigos(ventanaExtraerCodigos):
     labelInforme = Label(ventanaExtraerCodigos, text="Se han Cargado los códigos \nExitosamente")
     labelInforme.pack(padx=20, pady=30)
     labelInforme.config(fg='white',font=('Helvatical bold', 13), bg = '#153a7a')
-
-
 #   ------------------------------------------ VENTANA INSERTAR ClIENTE -------------------------------------------------
 
 def abrirVentanaIngresarCliente():
@@ -230,6 +228,20 @@ def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     entryNombre = Entry(ventanaInsertarCliente, width=100, justify="center")
     entryNombre.config(font=('Helvatical bold', 10))
     entryNombre.pack(padx=30, pady=0)
+
+    labelEspecifica = Label(ventanaInsertarCliente, text="Dirección Específica:")
+    labelEspecifica.pack(padx=20, pady=10)
+    labelEspecifica.config(fg='white',font=('Helvatical bold', 12), bg = '#153a7a')
+    entryEspecifica = Entry(ventanaInsertarCliente, width=100, justify="center")
+    entryEspecifica.config(font=('Helvatical bold', 10))
+    entryEspecifica.pack(padx=30, pady=0)
+
+    labelGeneral = Label(ventanaInsertarCliente, text="Dirección General:")
+    labelGeneral.pack(padx=20, pady=10)
+    labelGeneral.config(fg='white',font=('Helvatical bold', 12), bg = '#153a7a')
+    entryGeneral = Entry(ventanaInsertarCliente, width=100, justify="center")
+    entryGeneral.config(font=('Helvatical bold', 10))
+    entryGeneral.pack(padx=30, pady=0)
     try:
         Provincias =  conseguirProvincias(dicBD)
         ProvinciaSeleccionada = StringVar(ventanaInsertarCliente) #StrVar declara una variable de tipo cadena
@@ -256,21 +268,6 @@ def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
         botonInsertarEstudiante.pack(padx=30, pady=0)
     except:
         mostrarError(ventanaInsertarCliente,'Error')
-          
-def abrirVentanaLabelInsertarEtudiante(carnet, nombre,categoria, frase, grupo):
-    """
-    Funcionalidad: Valida que se ingresen los datos correctos antes de registrar el estudiante en la bitacora.
-    Entradas: carnet(str): del estudiante
-    nombre(str): Nombre del estudiante 
-    categoria(str): categoria seleccionada
-    frase(str): frase de la categoría seleccionada 
-    grupo(str): Grupo en el que se va a ubicar el estudiante. 
-    Salidas: Na
-    """
-    ventanaLabelInsertarEstudiante = crearVentanaSecundaria("Insertar un Estudiante")
-    dimensionarVentana(ventanaLabelInsertarEstudiante, 350, 250)
-    insertarEstudiante(carnet, nombre,categoria, frase, grupo)
-    ventanaLabelInsertarEstudiante.mainloop()
 
 def actualizarFrasesMostrar(provincia, cajaSeleccionFrases, cantones):
     """
@@ -311,7 +308,7 @@ def colocarComponentesVentanaRegistrarClientes(ventanaInsertarClientes):
     entryCantidadClientes.pack(padx=30, pady=0)
 
     botonInsertarClientes = Button(ventanaInsertarClientes,text="Insertar Clientes", command=lambda:abrirVentanaLabelInsertarClientes(entryCantidadClientes.get()))
-    botonInsertarClientes.config(width = "25",fg="white",font= ("Arial", 12))
+    botonInsertarClientes.config(width = "25",fg="black",font= ("Arial", 12))
     botonInsertarClientes.pack(padx=30, pady=30)
 
 def insertarClientes(cantidadGrupos):
