@@ -131,6 +131,15 @@ class Cliente():
         """
         return self.correo
     
+    def mostrarDatos(self): ##### Esta funcion es mantequilla, es para ver como guarda a los clientes XD #####
+        print(f"\ncedula: {self.obtenerCedula()}\n"
+        f"Nombre completo: {self.obtenerNombre()}\n"
+        f"Dir espe: {self.obtenerDirEspecifica()}\n"
+        f"Dir general: {self.obtenerDirGeneral()}\n"
+        f"codigo postal: {self.obtenerCodigoPostal()}\n"
+        f"correo: {self.obtenerCorreo()}\n")
+        return ""
+"""
 clienteActual = Cliente()
 clienteActual.asignarCedula("1-0000-0000")
 clienteActual.asignarNombre(("camilo", "sánchez", "rodríguez"))
@@ -144,3 +153,4 @@ print(f"Dir espe: {clienteActual.obtenerDirEspecifica()}")
 print(f"Dir gen: {clienteActual.obtenerDirGeneral()}")
 print(f"code postal: {clienteActual.obtenerCodigoPostal()}")
 print(f"Correo: {clienteActual.obtenerCorreo()}")
+"""    

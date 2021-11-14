@@ -10,8 +10,10 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
+from claseCliente import *
 from archivos import *
-import re
+import re, names
+from random import randint
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -45,7 +47,7 @@ def conseguirProvincias(pdict):
     -pdict(dict): Es el diccionario a sacar provincias
     Salidas: La lista con las provincias
     """
-    return pdict.keys()
+    return list(pdict.keys())
     
 def conseguirCantones(pdcit, pprovincia):
     """
@@ -55,7 +57,7 @@ def conseguirCantones(pdcit, pprovincia):
     -pprovincia(str): Es el nombre de la provincia a buscar 
     Salidas: Lista de los cantones de la provincia indicada
     """
-    return pdcit[pprovincia].keys()
+    return list(pdcit[pprovincia].keys())
 
 def conseguirDistritos(pdict, pprovincia, pcanton):
     """
@@ -66,7 +68,7 @@ def conseguirDistritos(pdict, pprovincia, pcanton):
     -pcanton(str): es le canton a sacar distritos
     Salidas: Lista de los distritos del canton indicado
     """
-    return pdict[pprovincia][pcanton].keys()
+    return list(pdict[pprovincia][pcanton].keys())
 
 def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
     """
@@ -107,6 +109,17 @@ def validarFormatoCorreo(pcorreo):
     if re.match("^[a-z\d]+[\._]?[a-z\d]+[@]\w+[.]\w{2,}$", pcorreo):
         return pcorreo
     return False
+
+def validarCedula(pcedula):
+    """
+    Funcionalidad: Valida que se ingrese una cedula formato correcto
+    Entradas: nombre(str): Nombre a validar 
+    Salidas: Booleano 
+    """
+    if re.match('^[1-9]{1}\d{4}0{1}\d{3}$', pcedula):
+        return pcedula
+    return False
+
 ####################################
 #        Utilidades extras         #
 ####################################
@@ -118,6 +131,103 @@ def mostrarNombreCliente(ptupla):
     Salidas: Str(); el nombre del usuario
     """
     return f"{ptupla[0]} {ptupla[1]} {ptupla[2]}"
+
+def crearCedula():
+    """
+    Función: Crea cédulas con el formato correcto de manera aleatoria
+    Entradas: N/A
+    Salidas: Str(); es la cédula
+    """
+    return f"{randint(1,9)}-{randint(0,9)}{randint(0,9)}{randint(0,9)}{randint(0,9)}-{randint(0,9)}{randint(0,9)}{randint(0,9)}{randint(0,9)}"
+
+def generarNombre(): 
+    """
+    Función:    Genera nombre y apellidos aleatorios para una persona.
+    Entrada:    N/A 
+    Salida:     String, nombre y apellidos aleatorios.
+    """
+    return (names.get_first_name(), names.get_last_name(), names.get_last_name())
+
+def generarDirEspecifica():
+    """
+    Función: Se encarga de generar la dirección específica de un cliente
+    Entradas: N/A
+    Salidas: Str(); es la direccion especifica del cliente
+    """
+    return f"CA{randint(1, 60)} AV{randint(1, 60)} #{randint(1, 60)}"
+
+def generarCodPostal_DirGeneral(pdictBD, pcedula):
+    """
+    Función: Crea el código postal de un cliente y su direccion general
+    Entradas:
+    -pdictBD(dict): Es el diccionario que contiene los datos de los codigos de distrito
+    -pcedula(str): es la cedula del usuario para crear el codigo postal
+    Salidas: Tuple(); en la primer posicion da el código postal, y en la segunda posicion da la direccion general
+    """
+    pcedula = pcedula[0]
+    if not re.match("^[1-7]", pcedula):
+        pcedula = "1" 
+    provinciaIndicada = conseguirProvincias(pdictBD)[int(pcedula)-1]
+    cantones = conseguirCantones(pdictBD, provinciaIndicada)
+    cantonRandom = cantones[randint(0, len(cantones)-1)]
+    distritos = conseguirDistritos(pdictBD, provinciaIndicada, cantonRandom)
+    distritoRandom = distritos[randint(0, len(distritos)-1)]
+    return (conseguirCodigo(pdictBD, provinciaIndicada, cantonRandom, distritoRandom), [provinciaIndicada, cantonRandom, distritoRandom])
+
+def generarCorreo(ptupla, pflag=True):
+    """
+    Función: Genera el correo de un cliente 
+    Entradas:
+    -ptupla(tuple): es la tupla que contiene el nombre del cliente
+    Salidas:
+    """
+    if pflag:
+        return f"{ptupla[0][1]}{ptupla[1]}@gmail.com".lower()
+    return f"{ptupla[0][1]}{ptupla[2]}@gmail.com".lower()
+
+def encontrarCorreo(pcorreo, plistaBD):
+    """
+    Función: Determina si un correo ya existe en la base de datos de clientes
+    Entradas:
+    -pcorreo(str): Es el correo a buscar
+    -plistaBD(list): Es la lista que contiene a los objetos (clientes)
+    Salidas: Bool
+    """
+    for objeto in plistaBD:
+        if objeto.obtenerCorreo() == pcorreo:
+            return True
+    return False
+
+def encontrarCedula(pcedula, plistaBD):
+    """
+    Función: Determina si una cédula ya existe en la base de datos de clientes
+    Entradas:
+    -pcedula(str): Es la cédula a buscar
+    -plistaBD(list): Es la lista que contiene a los objetos (clientes)
+    Salidas: Bool
+    """
+    for objeto in plistaBD:
+        if objeto.obtenerCedula == pcedula:
+            return True
+    return False
+####################################
+#          Generar clientes        #
+####################################
+def crearClientes(pcantidad, plistaBD, pdiccCodigos):
+    while pcantidad != 0:
+        cedula = crearCedula()
+        if not encontrarCedula(cedula, plistaBD):
+            nombre = generarNombre()
+            correo = generarCorreo(nombre, plistaBD)
+            if encontrarCorreo(correo, plistaBD):
+                correo = generarCorreo(nombre, False)
+            codigoDireccion = generarCodPostal_DirGeneral(pdiccCodigos, cedula)
+            clienteActu = Cliente()
+            clienteActu.asignarCedula(cedula), clienteActu.asignarNombre(nombre), clienteActu.asignarDirEspecifica(generarDirEspecifica()),
+            clienteActu.asignarDirGeneral(codigoDireccion[1]), clienteActu.asignarCodigoPostal(codigoDireccion[0]), clienteActu.asignarCorreo(correo)
+            plistaBD.append(clienteActu)
+            pcantidad -= 1
+    return plistaBD
 
 def crearCodigosPostales():
     diccionario = crearBDCodigos()
