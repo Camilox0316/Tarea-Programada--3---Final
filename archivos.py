@@ -68,5 +68,6 @@ def graba(nomArchGrabar,lista):
         f = open(nomArchGrabar,"wb")
         pickle.dump(lista,f)
         f.close()
+        return ""
     except:
         return ''

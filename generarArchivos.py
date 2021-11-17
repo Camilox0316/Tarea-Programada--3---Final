@@ -12,6 +12,7 @@ Versión:              Python 3.9.6
 
 import xml.etree.cElementTree as ET
 from funciones import *
+from fpdf import FPDF
 
 ##############################################################
 #####              Definición de Funciones               #####

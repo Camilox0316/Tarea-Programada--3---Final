@@ -19,6 +19,51 @@ dicBD = crearBDCodigos()
 ############################
 
 #   ------------------------------------------------- Formato general  -------------------------------------------------
+def crearBoton(pventana, ptexto, pfuncion):
+    """
+    Función:    Crea un botón con texto y comando para una ventana
+    Entradas:
+        pventana (tkinter.Tk)           - Ventana gráfica
+        ptexto (str)                    - Texto del botón
+        pfuncion (function)             - Acción del botón
+        pwidth (str, opcional)          - Longitud del botón
+        pgrid, pspan (tuple, opcional)  - Indican como acomodar botones
+    Salidas:    Retorna el botón creado
+    """
+    boton = ttk.Button(pventana, text= ptexto, command= pfuncion)
+    boton.config(width = "25")
+    boton.pack(padx=30, pady=10)    # Acomoda botón creado
+    return boton
+
+def crearLabel(pventana, ptexto):
+    """
+    Función:    Crea etiqueta para descripciones adicionales
+    Entradas:
+        pventana (tk.Toplevel)  - Ventana gráfica
+        ptexto (str)            - Texto que se muestra
+        pgrid (tuple, opcional) - Indica como acomodar texto y entrada
+    Salidas:    Retorna el objeto (etiqueta) creado
+    """
+    etiqueta = tk.Label(pventana, text = ptexto)
+    return etiqueta
+
+def crearEntradaTexto(pventana, ptexto, pvariable, pjustify):
+    """
+    Función:    Crea etiquetas y cajas de texto para una entrada
+    Entradas:
+        pventana (tk.Toplevel)           - Ventana gráfica
+        ptexto, pjustify (str)           - Texto de entrada y como justificarlo
+        pvariable (tk.StrVar/tk.IntVar)  - Variable donde se almacena entrada
+        pgrid (tuple)                    - Indica como acomodar texto y entrada
+    Salidas:    Retorna el objeto (entrada de texto) creado
+    """
+    # Objetos: etiqueta y boton
+    texto = tk.Label(pventana, text= ptexto)
+    texto.pack()
+    entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify)
+    entrada.pack()
+    return entrada
+
 def crearVentana(titulo):
     """
     Funcionalidad: Formato general para crear una nueva ventana 
@@ -33,14 +78,6 @@ def crearVentana(titulo):
     ventana.update()
     return ventana
 
-def crearVentanaSecundaria(titulo): 
-
-    ventanaSecundaria = Toplevel()
-    ventanaSecundaria.title(titulo)
-    ventanaSecundaria.resizable(False,False)
-    ventanaSecundaria.config(bg = '#153a7a')
-    ventanaSecundaria.iconbitmap('icon.ico')
-    return ventanaSecundaria  
 def dimensionarVentana(ventana, anchoVentana, altoVentana):
     """
     Funcionalidad: Ajusta el tamaño de la ventana según las medidas dadas
@@ -55,6 +92,32 @@ def dimensionarVentana(ventana, anchoVentana, altoVentana):
     posicionVentanaX = (anchoPantalla/2) - (anchoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje X
     posicionVentanaY = (altoPantalla/2) - (altoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje Y
     ventana.geometry('%dx%d+%d+%d' % (anchoVentana,altoVentana,posicionVentanaX,posicionVentanaY))
+
+def crearVentanaSecundaria(pventana, titulo, pancho, palto): 
+
+    ventanaSecundaria = Toplevel(pventana)
+    ventanaSecundaria.title(titulo)
+    ventanaSecundaria.resizable(False,False)
+    ventanaSecundaria.config(bg = '#153a7a')
+    ventanaSecundaria.iconbitmap('icon.ico')
+    ventanaSecundaria = dimensionarVentana(ventanaSecundaria, pancho, palto)
+    return ventanaSecundaria  
+
+def dimensionarVentana(ventana, anchoVentana, altoVentana):
+    """
+    Funcionalidad: Ajusta el tamaño de la ventana según las medidas dadas
+    Entradas: 
+    -ventana: La ventana que se quiere dimensionar 
+    -anchoVentana: El ancho que va a poseer la ventana 
+    -altoVentana: El alto que va a poseer la ventana
+    Salidas: Na 
+    """
+    anchoPantalla = ventana.winfo_screenwidth() # Toma el ancho de la pantalla de la computadora 
+    altoPantalla = ventana.winfo_screenheight() # Toma el alto de la pantalla de la computadora
+    posicionVentanaX = (anchoPantalla/2) - (anchoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje X
+    posicionVentanaY = (altoPantalla/2) - (altoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje Y
+    ventana.geometry('%dx%d+%d+%d' % (anchoVentana,altoVentana,posicionVentanaX,posicionVentanaY))
+
 def mostrarError(pventana, pmensaje):
     """
     Función:    Despliega interfaz con mensaje de error
@@ -82,118 +145,21 @@ def confirmarTk(pventana, pmensaje):
     Salidas:    Retorna True si se acepta, False si se cancela
     """
     return messagebox.askokcancel(title="Atención", message=pmensaje, parent=pventana)
-#   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
-
-def iniciarInterfaz():
-    """
-    Funcionalidad: Crea la ventana principal que contendrá los botones principales 
-    Entradas: Na 
-    Salidas: Na 
-    """
-    ventanaPrincipal = crearVentana("Correos Costa Rica")
-    dimensionarVentana(ventanaPrincipal, 370, 520)
-    colocarBotonesVentanaPrincipal(ventanaPrincipal)
-    ventanaPrincipal.mainloop()
-
-def colocarBotonesVentanaPrincipal(ventanaPrincipal):
-    """
-    Funcionalidad: Coloca los botones en la ventana principal 
-    Entradas: La ventana principal 
-    Salidas: Na (interfaz)
-    """
-    #global botonCargarCodigos 
-    #global botonRegistrarCliente
-    #global botonInsertarClientes
-    #global botonEtiquieta  
-    #global botonCorreo
-    #global botonExportarCodigo
-    #global botonReportes 
-    #global botonCredenciales
-    #global label
-
-    botonCargarCodigos = Button(ventanaPrincipal,text="1. Cargar Códigos Postales.",command= abrirVentanaCargarCodigos)
-    botonCargarCodigos.config(width = "25",fg="white", font= ("Arial", 12,BOLD),bg='#64fa6e')
-    botonCargarCodigos.pack(padx=30, pady=10)
-
-    botonRegistrarCliente = Button(ventanaPrincipal,text="2. Registrar Cliente.", command=abrirVentanaIngresarCliente)
-    botonRegistrarCliente.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
-    botonRegistrarCliente.pack(padx=30, pady=10)
-
-    botonInsertarClientes = Button(ventanaPrincipal,text="3. Crear Clientes.", command=abrirVentanaRegistrarClientes)
-    botonInsertarClientes.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
-    botonInsertarClientes.pack(padx=30, pady=10)
-
-    botonEtiqueta = Button(ventanaPrincipal,text="4. Generar Etiquieta.", command='')
-    botonEtiqueta.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e',command=abrirVentanaPdfEtiqueta)
-    botonEtiqueta.pack(padx=30, pady=10)
-
-    botonCorreo = Button(ventanaPrincipal,text="5. Enviar Correo.", command='')
-    botonCorreo.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
-    botonCorreo.pack(padx=30, pady=10)
-
-    botonExportarCodigo = Button(ventanaPrincipal,text="6. Exportar Códigos.", command='')
-    botonExportarCodigo.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e')
-    botonExportarCodigo.pack(padx=30, pady=10)
-
-    botonReportes = Button(ventanaPrincipal,text="7. Reportes.")
-    botonReportes.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e', command=abrirVentanaReportes)
-    botonReportes.pack(padx=30, pady=10)
-
-    botonCredenciales = Button(ventanaPrincipal,text="8. Credenciales.")
-    botonCredenciales.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e',command=abrirVentanaCredenciales)
-    botonCredenciales.pack(padx=30, pady=10)
-
-    botonSalir = Button(ventanaPrincipal,text="9. Salir.")
-    botonSalir.config(width = "25",fg="white",font= ("Arial", 12,BOLD),bg='#64fa6e', command=ventanaPrincipal.destroy)
-    botonSalir.pack(padx=30, pady=10)
-
-    #if verificarArchivo("frasesMotivadoras") and verificarArchivo("bitacora estudiantil"):
-    #    botonExtraerFrases.config(state = NORMAL)
-    #    botonInsertarGrupos.config(state = DISABLED)
-    #    botonInsertarEstudiante.config(state = DISABLED)
-    #    botonAgregarFrase.config(state = DISABLED)
-    #    botonEliminarEstudiante.config(state = DISABLED)
-    #    botonReportes.config(state = DISABLED)
-    #elif not verificarArchivo("frasesMotivadoras") and verificarArchivo("bitacora estudiantil"): 
-    #    botonExtraerFrases.config(state = DISABLED)
-    #    botonInsertarGrupos.config(state = NORMAL)
-    #    botonInsertarEstudiante.config(state = DISABLED)
-    #    botonAgregarFrase.config(state = DISABLED)
-    #    botonEliminarEstudiante.config(state = DISABLED)
-    #    botonReportes.config(state = DISABLED)
-    #else: 
-    #    botonExtraerFrases.config(state = DISABLED)
-    #    botonInsertarGrupos.config(state = DISABLED)
-    #    botonInsertarEstudiante.config(state = NORMAL)
-    #    botonAgregarFrase.config(state =NORMAL)
-    #    botonEliminarEstudiante.config(state = NORMAL)
-    #    botonReportes.config(state = NORMAL)
 
 #   -------------------------------------------- VENTANA CARGAR CODIGOS -------------------------------------------------
 
-def abrirVentanaCargarCodigos():
+def abrirVentanaCargarCodigos(pventana):
     """
     Funcionalidad: Al presionar el botón de extraer frases se abre esta abre una ventana que muestra un mensaje
     Entradas: Na 
     Salidas: Na
     """
-    global botonExtraerFrases        
-    global botonInsertarGrupos 
-    ventanaExtraerCodigos = crearVentanaSecundaria("Cargar Códigos Postales")
-    dimensionarVentana(ventanaExtraerCodigos, 350, 100)
-    leerTXT('BDPostalCR.txt') 
-    colocarLabelVentanaCargarCodigos(ventanaExtraerCodigos)
-    ventanaExtraerCodigos.mainloop()
-
-def colocarLabelVentanaCargarCodigos(ventanaExtraerCodigos):
-    """
-    Funcionalidad: Muestra una pequeña ventana indicando un mensaje de que se han almacenado las frases en la BD 
-    Entradas: VentanaExtraerFrases
-    Salidas: Una ventana con mensaje 
-    """
-    labelInforme = Label(ventanaExtraerCodigos, text="Se han Cargado los códigos \nExitosamente")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(fg='white',font=('Helvatical bold', 13), bg = '#153a7a')
+    #global botonExtraerFrases        
+    #global botonInsertarGrupos 
+    codigosPostalesDinamico = crearBDCodigos()
+    if codigosPostalesDinamico == False:
+        return mostrarError(pventana, "Error\nNo se ha encontrado el archivo que contiene los códigos postales.\nEl archivo se debe llamar: BDPostalCR.txt.")
+    return mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
 #   ------------------------------------------ VENTANA INSERTAR ClIENTE -------------------------------------------------
 
 def abrirVentanaIngresarCliente():
@@ -203,8 +169,7 @@ def abrirVentanaIngresarCliente():
     Entradas: Na 
     Salidas: Na 
     """
-    ventanaInsertarCliente = crearVentanaSecundaria("Insertar estudiante")
-    dimensionarVentana(ventanaInsertarCliente,350,500)
+    ventanaInsertarCliente = crearVentanaSecundaria("Insertar estudiante", 350, 500)
     colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
     ventanaInsertarCliente.mainloop()
 
@@ -279,38 +244,7 @@ def actualizarFrasesMostrar(provincia, cajaSeleccionFrases, cantones):
     for canton in cantones:
         cajaSeleccionFrases["menu"].add_command(label=canton, command=lambda canton=canton: cantones.set(canton))
 #   ----------------------------------------- VENTANA CREAR CLIENTES -------------------------------------------------
-
-def abrirVentanaRegistrarClientes():
-    """
-    Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, se abre o crea otra ventana 
-    que me permite ingresar la información requerida
-    Entradas: Na 
-    Salidas: Na 
-    """
-    ventanaRegistrarCliente = crearVentanaSecundaria("Crear Clientes")
-    dimensionarVentana(ventanaRegistrarCliente, 350, 235)
-    colocarComponentesVentanaRegistrarClientes(ventanaRegistrarCliente)
-    ventanaRegistrarCliente.mainloop()
-
-def colocarComponentesVentanaRegistrarClientes(ventanaInsertarClientes):
-    """
-    Funcionalidad: Coloca los label y cajas de texto en la ventana de insertar grupos 
-    Entradas: Ventana a insertar los datos 
-    Salidas: Na 
-    """
-    
-    labelCantidadClientes = Label(ventanaInsertarClientes, text="Cantidad de Clientes:")
-    labelCantidadClientes.pack(padx=20, pady=10)
-    labelCantidadClientes.config(font=('Helvatical bold', 12), bg = '#153a7a')
-    entryCantidadClientes = Entry(ventanaInsertarClientes, width=100, justify="center")
-    entryCantidadClientes.config(font=('Helvatical bold', 10))
-    entryCantidadClientes.pack(padx=30, pady=0)
-
-    botonInsertarClientes = Button(ventanaInsertarClientes,text="Insertar Clientes", command=lambda:abrirVentanaLabelInsertarClientes(entryCantidadClientes.get()))
-    botonInsertarClientes.config(width = "25",fg="black",font= ("Arial", 12))
-    botonInsertarClientes.pack(padx=30, pady=30)
-
-def insertarClientes(cantidadGrupos):
+def esEntero(cantidadGrupos):
     """
     Funcionamiento: Permite ingresar la cantidad de grupos y la cantidad de estudiantes por grupo
     en la ventana de insertar n grupos 
@@ -326,18 +260,33 @@ def insertarClientes(cantidadGrupos):
     except:
         return False
 
-def abrirVentanaLabelInsertarClientes(cantidadClientes):
-    """
-    Funcionalidad: Al presionar el botón de insertar Grupos se abre esta abre una ventana que muestra un mensaje
-    de realimentación o de error. 
-    Entradas: Na 
-    Salidas: Na
-    """
-    ventanaInsertarLabelClientes = crearVentanaSecundaria("Cantidad de Clientes")
-    dimensionarVentana(ventanaInsertarLabelClientes, 400, 100)
-    insertarClientes(cantidadClientes)
-    ventanaInsertarLabelClientes.mainloop()
+def validarRegistrarClientes(pventana, pnum):
+    if not esEntero(pnum):
+        return mostrarError(pventana, "Solo se deben ingresar números enteros.")
+    crearClientes(int(pnum), [], dicBD)
+    return mostrarInfo(pventana, "Base de datos creada.")
 
+def entradasRegistrarClientes(pventana):
+    cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
+    funcion = lambda: validarRegistrarClientes(pventana, cantidadClientes.get())
+    botonIngresar = crearBoton(pventana, "Crear", funcion)
+
+def menuRegistrarClientes(pprincipal):
+    """
+    Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, se abre o crea otra ventana 
+    que me permite ingresar la información requerida
+    Entradas: Na 
+    Salidas: Na 
+    """
+    ventana = tk.Toplevel(pprincipal)
+    # Configuracion de la ventana secundaria
+    ventana.title("Crear clientes")
+    ventana.geometry("300x170")
+    ventana.resizable(0,0)
+    ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 350, 100)
+    entradasRegistrarClientes(ventana)
+    
 ############################################## ETIQUIETA  ###############################################
 def abrirVentanaPdfEtiqueta():
     """
@@ -345,8 +294,7 @@ def abrirVentanaPdfEtiqueta():
     Entradas: Na 
     Salidas: reporte pdf 
     """
-    ventanaEtiqueta = crearVentanaSecundaria("Reporte PDF")
-    dimensionarVentana(ventanaEtiqueta, 350, 160)
+    ventanaEtiqueta = crearVentanaSecundaria("Reporte PDF", 350, 160)
     # Meter una función que haga la etiqueta
     labelInforme = Label(ventanaEtiqueta, text="Se ha creado el reporte PDF \ncon éxito.")
     labelInforme.pack(padx=20, pady=30)
@@ -363,7 +311,7 @@ def abrirVentanaEliminarEstudiante():
     ventanaEliminarEstudiante = crearVentana("Eliminar estudiante")
     dimensionarVentana(ventanaEliminarEstudiante, 350, 300)
     colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante)
-    ventanaEliminarEstudiante.mainloop()
+    
 def colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante):
     """
     Funcionalidad: Se colocan los componentes (entry y botón) en la ventana de eliminar estudiante 
@@ -389,8 +337,7 @@ def abrirVentanaReportes():
     Entradas: Na
     Salidas: Na
     """ 
-    ventanaReportes = crearVentanaSecundaria("Reportes")
-    dimensionarVentana(ventanaReportes, 350, 320)
+    ventanaReportes = crearVentanaSecundaria("Reportes", 350, 320)
     colocarBotonesVentanaReportes(ventanaReportes)
     ventanaReportes.mainloop()
 def colocarBotonesVentanaReportes(ventanaReportes):
@@ -423,8 +370,7 @@ def abrirVentanaReportesProvincia():
     """
     try:
         Provincias =  conseguirProvincias(dicBD)
-        ventanaReportesProvincia = crearVentanaSecundaria("Reportes por Provincia")
-        dimensionarVentana(ventanaReportesProvincia, 350, 110)
+        ventanaReportesProvincia = crearVentanaSecundaria("Reportes por Provincia", 350, 110)
         grupoSeleccionado = StringVar(ventanaReportesProvincia)
         grupoSeleccionado.set("Seleccione una Provincia")
         cajaSeleccionProvincia = OptionMenu(ventanaReportesProvincia, grupoSeleccionado, *Provincias)
@@ -442,8 +388,7 @@ def generarReportePorClientesProvincia(grupoSeleccionado):
     Entradas: Provincia(str)
     Salidas: reporte html 
     """
-    ventanaReportesProvincia = crearVentanaSecundaria("Reporte Cliente")
-    dimensionarVentana(ventanaReportesProvincia, 350, 110)
+    ventanaReportesProvincia = crearVentanaSecundaria("Reporte Cliente", 350, 110)
     if grupoSeleccionado != "Seleccione una Provincia": # va a ser la provincia
         # Genera html de los clientes de una provincia 
         labelInforme = Label(ventanaReportesProvincia, text=f"Se ha creado el reporte de clientes {grupoSeleccionado} \ncon éxito.")
@@ -461,8 +406,7 @@ def abrirVentanaReporteCliente():
     Entradas: Na
     Salidas: ventana 
     """
-    ventanaReporteCliente = crearVentanaSecundaria("Reportes por categoría de frase")
-    dimensionarVentana(ventanaReporteCliente, 350, 110)
+    ventanaReporteCliente = crearVentanaSecundaria("Reportes por categoría de frase", 350, 110)
     entryCedula = Entry(ventanaReporteCliente, width=100, justify="center")
     entryCedula.config(font=('Helvatical bold', 10))
     entryCedula.pack(padx=30, pady=0)
@@ -489,8 +433,7 @@ def abrirVentanaReporteCodigos():
     Entradas: Na
     Salidas: ventana 
     """
-    ventanaReporteCodigo = crearVentanaSecundaria("Reportes por código")
-    dimensionarVentana(ventanaReporteCodigo, 350, 110)
+    ventanaReporteCodigo = crearVentanaSecundaria("Reportes por código", 350, 110)
     entryCodigo = Entry(ventanaReporteCodigo, width=100, justify="center")
     entryCodigo.config(font=('Helvatical bold', 10))
     entryCodigo.pack(padx=30, pady=0)
@@ -518,14 +461,45 @@ def abrirVentanaCredenciales():
     Entradas: Na 
     Salidas: N/A
     """
-    ventanaCredencial = crearVentanaSecundaria("Reporte Excel")
-    dimensionarVentana(ventanaCredencial, 350, 160)
+    ventanaCredencial = crearVentanaSecundaria("Credenciales", 350, 160)
     # Crear Función que muestre credenciales
     labelInforme = Label(ventanaCredencial, text="Las credenciales estan listas.")
     labelInforme.pack(padx=20, pady=30)
     labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
+#   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
+def colocarBotonesVentanaPrincipal(ventanaPrincipal):
+    """
+    Funcionalidad: Coloca los botones en la ventana principal 
+    Entradas: La ventana principal 
+    Salidas: Na (interfaz)
+    """
+    nombresBotones = ("1. Cargar códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
+    "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
+    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(), 
+                lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(), 
+                lambda: print("Agregar la funcion"), lambda: print("Agregar la funcion"), 
+                lambda: abrirVentanaReportes(), lambda: abrirVentanaCredenciales())
+    botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
+    botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
+    botonInsertarClientes = crearBoton(ventanaPrincipal, nombresBotones[2], funciones[2])
+    botonCrearEtiqueta = crearBoton(ventanaPrincipal, nombresBotones[3], funciones[3])
+    botonEnviarCorreo =  crearBoton(ventanaPrincipal, nombresBotones[4], funciones[4])
+    botonExportarCodigos = crearBoton(ventanaPrincipal, nombresBotones[5], funciones[5])
+    botonCrearReportes = crearBoton(ventanaPrincipal, nombresBotones[6], funciones[6])
+    botonCredenciales = crearBoton(ventanaPrincipal, nombresBotones[7], funciones[7])
+    botonSalir = crearBoton(ventanaPrincipal, nombresBotones[-1], ventanaPrincipal.destroy)
+    return botonCargarCodigos, botonRegistraCliente, botonInsertarClientes, botonCrearEtiqueta, botonEnviarCorreo, botonExportarCodigos, botonCrearReportes, botonCredenciales
+
+def iniciarInterfaz():
+    """
+    Funcionalidad: Crea la ventana principal que contendrá los botones principales 
+    Entradas: Na 
+    Salidas: Na 
+    """
+    ventanaPrincipal = crearVentana("Correos Costa Rica")
+    dimensionarVentana(ventanaPrincipal, 370, 520)
+    colocarBotonesVentanaPrincipal(ventanaPrincipal)
+    ventanaPrincipal.mainloop()
 
 if __name__ == "__main__": #Si se ha ejecutado como programa principal se ejecuta el código dentro del condicional.
     iniciarInterfaz()
-
-

@@ -10,15 +10,10 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
-from datetime import *
-from pickle import *
 from archivos import *
-from fpdf import FPDF
-import smtplib # Correo
-import datetime
 from claseCliente import *
-import re, names
-from random import randint
+from random import paretovariate, randint
+import re, names, datetime, smtplib
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -33,8 +28,10 @@ def crearBDCodigos():
     Salidas:
     -diccionario(dict): Contiene: {Provincia: {Cantones: {Distritos: Código}}}
     """
-    parchivo = leerTXT("BDPostalCR.txt").splitlines()
-    diccionario = {}
+    parchivo = leerTXT("BDPostalCR.txt")
+    if parchivo == "":
+        return False
+    parchivo, diccionario = parchivo.splitlines(), {}
     for elemento in parchivo:
         actual = elemento.split(";") # [provincia, canton, distrito, codigo]
         provincia, canton = actual[0], actual[1]
@@ -88,6 +85,14 @@ def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
 ####################################
 #             Validaciones         #
 ####################################
+def verificarArchivo(nombreArchivo): 
+    """
+    Funcionalidad: verifica si el archivo existe
+    Entradas: nombre de archivo
+    Salidas: Bool
+    """
+    return leerTXT(nombreArchivo) == ""
+
 def validarNombre(pnombre):
     """
     Función:    Determina si el valor ingresado coincide con el formato de nombre , no permite números
@@ -235,40 +240,13 @@ def crearClientes(pcantidad, plistaBD, pdiccCodigos):
             pcantidad -= 1
     return plistaBD
 
-def crearCodigosPostales():
-    diccionario = crearBDCodigos()
-    matriz = []
-    for indice, llave in enumerate(diccionario.keys()):
-        matriz.append([llave]) # [[san jose, []]]
-        for canton, distrito in diccionario[llave].items():
-            matriz[indice].append([canton, distrito]) 
-    return matriz
-########################################### Validaciones ################################################
-def validarCedula(cedula):
-    """
-    Funcionalidad: Valida que se ingrese una cedula formato correcto
-    Entradas: nombre(str): Nombre a validar 
-    Salidas: Booleano 
-    """
-    if re.match('^[1-9]{1}\d{4}0{1}\d{3}$',cedula):
-        return True
-    return False
-def verificarArchivo(nombreArchivo): 
-    """
-    Funcionalidad: verifica si el archivo existe
-    Entradas: nombre de archivo
-    Salidas: Bool
-    """
-    return leerTXT(nombreArchivo) == ""
-
 def enviarCorreo(correo,nombre):
     """
     Funcionalidad: Envia correo  
     Entradas: correo
     Salidas: NA  
     """
-    tomorrow = str(datetime.date.today() + datetime.timedelta(days=1))
-    message = f'Para informarle a {nombre}.\nLa entrega de su paquete es: {tomorrow}.'
+    message = f'Para informarle a {nombre}.\nLa entrega de su paquete es: {str(datetime.date.today() + datetime.timedelta(days=1))}.'
     subject = 'Entrega de paquete'
     message = 'Subject: {}\n\n{}'.format(subject, message)
     server = smtplib.SMTP('smtp.gmail.com',587)
@@ -276,5 +254,5 @@ def enviarCorreo(correo,nombre):
     server.login('correoscrmariocamilo@gmail.com','tareaProgramada')
     server.sendmail('correoscrmariocamilo@gmail.com',correo,message)
     server.quit()
-    print('Correo enviado')
+    return "Se envió con éxito."
 #enviarCorreo('marionetabar1@gmail.com','Mario')

@@ -9,6 +9,9 @@ Versión:              Python 3.9.6
 ##############################################################
 #####              Definición de clases                  #####
 ##############################################################
+import tkinter as tk
+from tkinter import messagebox, ttk
+
 class Cliente():
     def __init__(self):
         """
@@ -139,6 +142,7 @@ class Cliente():
         f"codigo postal: {self.obtenerCodigoPostal()}\n"
         f"correo: {self.obtenerCorreo()}\n")
         return ""
+    
 """
 clienteActual = Cliente()
 clienteActual.asignarCedula("1-0000-0000")
