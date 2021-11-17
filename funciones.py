@@ -10,8 +10,13 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
-from claseCliente import *
+from datetime import *
+from pickle import *
 from archivos import *
+from fpdf import FPDF
+import smtplib # Correo
+import datetime
+from claseCliente import *
 import re, names
 from random import randint
 
@@ -238,6 +243,38 @@ def crearCodigosPostales():
         for canton, distrito in diccionario[llave].items():
             matriz[indice].append([canton, distrito]) 
     return matriz
-lista = []
-BD = crearBDCodigos()
-print(crearClientes(10, lista, BD))
+########################################### Validaciones ################################################
+def validarCedula(cedula):
+    """
+    Funcionalidad: Valida que se ingrese una cedula formato correcto
+    Entradas: nombre(str): Nombre a validar 
+    Salidas: Booleano 
+    """
+    if re.match('^[1-9]{1}\d{4}0{1}\d{3}$',cedula):
+        return True
+    return False
+def verificarArchivo(nombreArchivo): 
+    """
+    Funcionalidad: verifica si el archivo existe
+    Entradas: nombre de archivo
+    Salidas: Bool
+    """
+    return leerTXT(nombreArchivo) == ""
+
+def enviarCorreo(correo,nombre):
+    """
+    Funcionalidad: Envia correo  
+    Entradas: correo
+    Salidas: NA  
+    """
+    tomorrow = str(datetime.date.today() + datetime.timedelta(days=1))
+    message = f'Para informarle a {nombre}.\nLa entrega de su paquete es: {tomorrow}.'
+    subject = 'Entrega de paquete'
+    message = 'Subject: {}\n\n{}'.format(subject, message)
+    server = smtplib.SMTP('smtp.gmail.com',587)
+    server.starttls()
+    server.login('correoscrmariocamilo@gmail.com','tareaProgramada')
+    server.sendmail('correoscrmariocamilo@gmail.com',correo,message)
+    server.quit()
+    print('Correo enviado')
+#enviarCorreo('marionetabar1@gmail.com','Mario')
