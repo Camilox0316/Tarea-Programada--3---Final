@@ -15,7 +15,9 @@ from pickle import *
 from archivos import *
 import re
 from fpdf import FPDF
-import smtplib
+import smtplib # Correo
+import datetime
+
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -207,18 +209,21 @@ def creaPdf(nombre,especifica,general,codigo):
     return 'Archivo Creado'
 #creaPdf('Mario Barboza Artavia','Alajuela, San Ramon, San Ramón ','AV: 2 C: 2 #55 ' ,'1101010')
 
-def enviarCorreo(correo):
+def enviarCorreo(correo,nombre):
     """
     Funcionalidad: Envia correo  
     Entradas: correo
     Salidas: NA  
     """
+    tomorrow = str(datetime.date.today() + datetime.timedelta(days=1))
+    message = f'Para informarle a {nombre}.\nLa entrega de su paquete es: {tomorrow}.'
+    subject = 'Entrega de paquete'
+    message = 'Subject: {}\n\n{}'.format(subject, message)
     server = smtplib.SMTP('smtp.gmail.com',587)
     server.starttls()
     server.login('correoscrmariocamilo@gmail.com','tareaProgramada')
-    server.sendmail('correoscrmariocamilo@gmail.com',correo,'La proxima fecha de entrega sera el dia (poner el dia no lo entendi)')
+    server.sendmail('correoscrmariocamilo@gmail.com',correo,message)
     server.quit()
-    return 'Correo enviado'
-#enviarCorreo('marionetabar1@gmail.com')
-print(str(date.today() + datetime.timedelta(days=1)))
+    print('Correo enviado')
+#enviarCorreo('marionetabar1@gmail.com','Mario')
 

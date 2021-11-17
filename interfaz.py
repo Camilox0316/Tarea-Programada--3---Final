@@ -101,15 +101,15 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     Entradas: La ventana principal 
     Salidas: Na (interfaz)
     """
-    global botonCargarCodigos 
-    global botonRegistrarCliente
-    global botonInsertarClientes
-    global botonEtiquieta  
-    global botonCorreo
-    global botonExportarCodigo
-    global botonReportes 
-    global botonCredenciales
-    global label
+    #global botonCargarCodigos 
+    #global botonRegistrarCliente
+    #global botonInsertarClientes
+    #global botonEtiquieta  
+    #global botonCorreo
+    #global botonExportarCodigo
+    #global botonReportes 
+    #global botonCredenciales
+    #global label
 
     botonCargarCodigos = Button(ventanaPrincipal,text="1. Cargar Códigos Postales.",command= abrirVentanaCargarCodigos)
     botonCargarCodigos.config(width = "25",fg="white", font= ("Arial", 12,BOLD),bg='#64fa6e')
