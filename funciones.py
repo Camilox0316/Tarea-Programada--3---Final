@@ -166,7 +166,7 @@ def generarCodPostal_DirGeneral(pdictBD, pcedula):
     """
     pcedula = pcedula[0]
     if not re.match("^[1-7]", pcedula):
-        pcedula = "1" 
+        pcedula = "1"
     provinciaIndicada = conseguirProvincias(pdictBD)[int(pcedula)-1]
     cantones = conseguirCantones(pdictBD, provinciaIndicada)
     cantonRandom = cantones[randint(0, len(cantones)-1)]
@@ -182,8 +182,8 @@ def generarCorreo(ptupla, pflag=True):
     Salidas:
     """
     if pflag:
-        return f"{ptupla[0][1]}{ptupla[1]}@gmail.com".lower()
-    return f"{ptupla[0][1]}{ptupla[2]}@gmail.com".lower()
+        return f"{ptupla[0][0]}{ptupla[1]}@gmail.com".lower()
+    return f"{ptupla[0][0]}{ptupla[2]}@gmail.com".lower()
 
 def encontrarCorreo(pcorreo, plistaBD):
     """
@@ -218,13 +218,14 @@ def crearClientes(pcantidad, plistaBD, pdiccCodigos):
         cedula = crearCedula()
         if not encontrarCedula(cedula, plistaBD):
             nombre = generarNombre()
-            correo = generarCorreo(nombre, plistaBD)
+            correo = generarCorreo(nombre)
             if encontrarCorreo(correo, plistaBD):
                 correo = generarCorreo(nombre, False)
             codigoDireccion = generarCodPostal_DirGeneral(pdiccCodigos, cedula)
             clienteActu = Cliente()
             clienteActu.asignarCedula(cedula), clienteActu.asignarNombre(nombre), clienteActu.asignarDirEspecifica(generarDirEspecifica()),
             clienteActu.asignarDirGeneral(codigoDireccion[1]), clienteActu.asignarCodigoPostal(codigoDireccion[0]), clienteActu.asignarCorreo(correo)
+            clienteActu.mostrarDatos()
             plistaBD.append(clienteActu)
             pcantidad -= 1
     return plistaBD
@@ -237,3 +238,6 @@ def crearCodigosPostales():
         for canton, distrito in diccionario[llave].items():
             matriz[indice].append([canton, distrito]) 
     return matriz
+lista = []
+BD = crearBDCodigos()
+print(crearClientes(10, lista, BD))
