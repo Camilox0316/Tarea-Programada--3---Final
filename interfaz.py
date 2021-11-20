@@ -12,7 +12,7 @@ from tkinter import messagebox, ttk
 ############################
 
 dicBD = crearBDCodigos()
-
+clientes = []
 
 ############################
 # Definición de Funciones  # 
