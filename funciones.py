@@ -13,7 +13,7 @@ Versión:              Python 3.9.6
 from archivos import *
 from claseCliente import *
 from random import randint
-import re, names, datetime, smtplib
+import re, names, datetime, smtplib, os
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -235,7 +235,6 @@ def crearClientes(pcantidad, plistaBD, pdiccCodigos):
             clienteActu = Cliente()
             clienteActu.asignarCedula(cedula), clienteActu.asignarNombre(nombre), clienteActu.asignarDirEspecifica(generarDirEspecifica()),
             clienteActu.asignarDirGeneral(codigoDireccion[1]), clienteActu.asignarCodigoPostal(codigoDireccion[0]), clienteActu.asignarCorreo(correo)
-            clienteActu.mostrarDatos()
             plistaBD.append(clienteActu)
             pcantidad -= 1
     return plistaBD
@@ -255,24 +254,8 @@ def enviarCorreo(correo,nombre):
     server.sendmail('correoscrmariocamilo@gmail.com',correo,message)
     server.quit()
     return "Se envió con éxito."
+
 #enviarCorreo('marionetabar1@gmail.com','Mario')
-tabla = f"""
-<html> 
-    <head> <meta charset = "ISO 8859-1"/><title> Analisis-{1} </title> </head> <body> <p> {1} </p><table  width = "70%" border="2"> 
-    <tr> <th colspan="6"> 
-    		<div align ="center"><strong> Análisis del documento </strong></div>
-    </th> </tr> 
-    <tr style=text-align:center> 
-        <th> Artículos </th> 
-        <th> Preposiciones </th>
-        <th> Pronombres </th> 
-        <th> Verbos</th><th> Números </th>
-        <th> Sin Clasificar </th> 
-    </tr>"""
-tabla += f"""<tr style=text-align:center > 
-    <td> {1}</td> 
-    <td> {1} </td> 
-    <td> {1} </td>  
-    <td> {1} </td> 
-    <td> {1} </td> 
-    <td> {1} </td>"""
+
+
+
