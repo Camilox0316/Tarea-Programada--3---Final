@@ -3,9 +3,11 @@
 ############################
 from tkinter import *
 from tkinter.font import BOLD
+from typing import Sized
 from funciones import *
 from archivos import *
 from tkinter import messagebox, ttk
+import os
 
 ############################
 #    Variables globales    # 
@@ -35,7 +37,7 @@ def crearBoton(pventana, ptexto, pfuncion):
     boton.pack(padx=30, pady=10)    # Acomoda botón creado
     return boton
 
-def crearLabel(pventana, ptexto):
+def crearLabel(pventana, ptexto,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black'):
     """
     Función:    Crea etiqueta para descripciones adicionales
     Entradas:
@@ -45,9 +47,10 @@ def crearLabel(pventana, ptexto):
     Salidas:    Retorna el objeto (etiqueta) creado
     """
     etiqueta = tk.Label(pventana, text = ptexto)
+    etiqueta.config(font=(pfont,psize),bg=pbg,fg=pfg)
     return etiqueta
 
-def crearEntradaTexto(pventana, ptexto, pvariable, pjustify):
+def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black'):
     """
     Función:    Crea etiquetas y cajas de texto para una entrada
     Entradas:
@@ -59,11 +62,11 @@ def crearEntradaTexto(pventana, ptexto, pvariable, pjustify):
     """
     # Objetos: etiqueta y boton
     texto = tk.Label(pventana, text= ptexto)
+    texto.config(font=(pfont,psize),bg=pbg,fg=pfg)
     texto.pack()
     entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify)
     entrada.pack()
     return entrada
-
 def crearVentana(titulo):
     """
     Funcionalidad: Formato general para crear una nueva ventana 
@@ -73,7 +76,7 @@ def crearVentana(titulo):
     ventana = Tk()
     ventana.title(titulo)
     ventana.resizable(False,False)
-    ventana.config(bg = '#ffffff')
+    ventana.config(bg = '#f0f0f0')
     ventana.iconbitmap('icon.ico')
     ventana.update()
     return ventana
@@ -154,25 +157,75 @@ def abrirVentanaCargarCodigos(pventana):
     Entradas: Na 
     Salidas: Na
     """
-    #global botonExtraerFrases        
-    #global botonInsertarGrupos 
     codigosPostalesDinamico = crearBDCodigos()
     if codigosPostalesDinamico == False:
         return mostrarError(pventana, "Error\nNo se ha encontrado el archivo que contiene los códigos postales.\nEl archivo se debe llamar: BDPostalCR.txt.")
     return mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
 #   ------------------------------------------ VENTANA INSERTAR ClIENTE -------------------------------------------------
+def validarRegistrarClientes(pventana, pnum):
+    if not esEntero(pnum):
+        return mostrarError(pventana, "Solo se deben ingresar números enteros.")
+    crearClientes(int(pnum), [], dicBD)
+    return mostrarInfo(pventana, "Base de datos creada.")
 
-def abrirVentanaIngresarCliente():
+def entradasRegistrarClientes(pventana):
+    cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
+    funcion = lambda: validarRegistrarClientes(pventana, cantidadClientes.get())
+    botonIngresar = crearBoton(pventana, "Crear", funcion)
+def abrirVentanaIngresarCliente(pventana):
     """
     Funcionalidad: Al presionar el botón de insertar estudiante se abre esta ventana, la cual contiene cajas de texto
     menú de selección para ingresar los datos.
     Entradas: Na 
     Salidas: Na 
     """
-    ventanaInsertarCliente = crearVentanaSecundaria("Insertar estudiante", 350, 500)
+    ventanaInsertarCliente = tk.Toplevel(pventana)
+  # Configuracion de la ventana secundaria
+    ventanaInsertarCliente.title("Registrar Cliente")
+    ventanaInsertarCliente.geometry("400x170")
+    ventanaInsertarCliente.resizable(0,0)
+    ventanaInsertarCliente.iconbitmap('icon.ico')
+    ventanaInsertarCliente.lift(pventana)  # Posiciona por encima de ventana principal
+    dimensionarVentana(ventanaInsertarCliente, 350, 600)
     colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
     ventanaInsertarCliente.mainloop()
+def actualizarCantonesMostrar(provincia, cajaSeleccionP,cantonSeleccionado):
+    """
+    Funcionalidad: Actualiza las frases en la caja de seleccion, para que se muestren las que corresponden
+    a la categoría seleccionada.
+    Entradas: CategoriaSeleccionada, cajaSeleccionFrases, fraseSeleccionada
+    Salidas: Actualiza la variable con las frases de la categoría seleccionada 
+    """
+    print(provincia)
+    cantones = conseguirCantones(dicBD,provincia)
+    cantonesMostrados = []
+    for cantoncito in cantones:
+        cantonesMostrados.append(cantoncito)
+    cajaSeleccionP["menu"].delete(0,"end")
+    for canton in cantonesMostrados:
+        cajaSeleccionP["menu"].add_command(label=canton, command=lambda canton=canton: cantonSeleccionado.set(canton))
 
+def actualizarDistritosMostrar(provincia, canton, cajaSeleccionC,distritoSeleccionado):
+    """
+    Funcionalidad: Actualiza las frases en la caja de seleccion, para que se muestren las que corresponden
+    a la categoría seleccionada.
+    Entradas: CategoriaSeleccionada, cajaSeleccionFrases, fraseSeleccionada
+    Salidas: Actualiza la variable con las frases de la categoría seleccionada 
+    """
+    print('hola')
+    print(provincia)
+    print(canton)
+    if provincia == 'Seleccione una Provincia:' or canton == 'Seleccione un Cantón:':
+        return cajaSeleccionC["menu"].add_command(label='', command=lambda distrito='': distritoSeleccionado.set(distrito))
+    distritos = conseguirDistritos(dicBD,provincia,canton)
+    print(distritos)
+    distritosMostrados = []
+    for distitrito in distritos:
+        distritosMostrados.append(distitrito)
+    cajaSeleccionC["menu"].delete(0,"end")
+    for distrito in distritosMostrados:
+        cajaSeleccionC["menu"].add_command(label=distrito, command=lambda distrito=distrito: distritoSeleccionado.set(distrito))
+    return distrito
 def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     """
     Funcionalidad: Coloca los componentes(cajas de texto,labels, caja de seleccion) en la ventana
@@ -180,69 +233,48 @@ def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     Entradas: La ventana en la que se van a unicar los componentes(VentanaInsertarEstudiante)
     Salidas: Na 
     """
-    labelCedula = Label(ventanaInsertarCliente, text="Cédula:")
-    labelCedula.pack(padx=20, pady=10)
-    labelCedula.config(fg='white',font=('Helvatical bold', 12), bg = '#153a7a')
-    entryCedula = Entry(ventanaInsertarCliente, width=100, justify="center")
-    entryCedula.config(font=('Helvatical bold', 10))
-    entryCedula.pack(padx=30, pady=0)
+    cedula = crearEntradaTexto(ventanaInsertarCliente, "Cédula: ", tk.StringVar(), "center",psize=10).pack(padx=20, pady=0)
+    nombre = crearEntradaTexto(ventanaInsertarCliente, "Nombre: ", tk.StringVar(), "center",psize=10).pack(padx=20, pady=15)
+    uEspecifica=crearEntradaTexto(ventanaInsertarCliente, "Ubicación Específica: ", tk.StringVar(), "center",psize=10).pack(padx=20, pady=15)
+    uGeneral=crearEntradaTexto(ventanaInsertarCliente, "Ubicación General: ", tk.StringVar(), "center",psize=10).pack(padx=20, pady=0)
+    #try:
+    Provincias =  conseguirProvincias(dicBD)
+    ProvinciaSeleccionada = StringVar(ventanaInsertarCliente) #StrVar declara una variable de tipo cadena
+    ProvinciaSeleccionada.set("Seleccione una Provincia:")
+    
+    Cantones = [""]
+    CantonSeleccionado = StringVar(ventanaInsertarCliente)
+    CantonSeleccionado.set("Seleccione un Cantón:")
+    
+    Distritos = [""] 
+    DistritoSeleccionado = StringVar(ventanaInsertarCliente)
+    DistritoSeleccionado.set("Seleccione un Distrito: ")
 
-    labelNombre = Label(ventanaInsertarCliente, text="Nombre:")
-    labelNombre.pack(padx=20, pady=10)
-    labelNombre.config(fg='white',font=('Helvatical bold', 12), bg = '#153a7a')
-    entryNombre = Entry(ventanaInsertarCliente, width=100, justify="center")
-    entryNombre.config(font=('Helvatical bold', 10))
-    entryNombre.pack(padx=30, pady=0)
+    Codigo = [""]
+    CodigoSeleccionado = StringVar(ventanaInsertarCliente)
+    CodigoSeleccionado.set("Su código postal es:")
 
-    labelEspecifica = Label(ventanaInsertarCliente, text="Dirección Específica:")
-    labelEspecifica.pack(padx=20, pady=10)
-    labelEspecifica.config(fg='white',font=('Helvatical bold', 12), bg = '#153a7a')
-    entryEspecifica = Entry(ventanaInsertarCliente, width=100, justify="center")
-    entryEspecifica.config(font=('Helvatical bold', 10))
-    entryEspecifica.pack(padx=30, pady=0)
+    cajaSeleccionCodigo = OptionMenu(ventanaInsertarCliente, CodigoSeleccionado, *Codigo)
 
-    labelGeneral = Label(ventanaInsertarCliente, text="Dirección General:")
-    labelGeneral.pack(padx=20, pady=10)
-    labelGeneral.config(fg='white',font=('Helvatical bold', 12), bg = '#153a7a')
-    entryGeneral = Entry(ventanaInsertarCliente, width=100, justify="center")
-    entryGeneral.config(font=('Helvatical bold', 10))
-    entryGeneral.pack(padx=30, pady=0)
-    try:
-        Provincias =  conseguirProvincias(dicBD)
-        ProvinciaSeleccionada = StringVar(ventanaInsertarCliente) #StrVar declara una variable de tipo cadena
-        ProvinciaSeleccionada.set("Seleccione una Provincia:")
-        # .set() asigna un valor a una variable de control. Se utiliza para modificar el valor o estado de un widged
-        Cantones = [""] 
-        CantonSeleccionado = StringVar(ventanaInsertarCliente)
-        CantonSeleccionado.set("Seleccione un Cantón:")
-        cajaSeleccionCanton = OptionMenu(ventanaInsertarCliente, CantonSeleccionado, *Cantones)
-        cajaSeleccionProvincia = OptionMenu(ventanaInsertarCliente, ProvinciaSeleccionada, *Provincias, 
-        command=lambda ProvinciaSeleccionada: actualizarFrasesMostrar(ProvinciaSeleccionada, cajaSeleccionCanton, CantonSeleccionado))
-        cajaSeleccionProvincia.pack(padx=20, pady=30)
-        cajaSeleccionCanton.pack(padx=20, pady=0)
+    cajaSeleccionDistrito = OptionMenu(ventanaInsertarCliente, DistritoSeleccionado, *Distritos)
 
-        Distritos = [""] 
-        DistritoSeleccionado = StringVar(ventanaInsertarCliente)
-        DistritoSeleccionado.set("Seleccione un Distrito: ")
-        cajaSeleccionDistrito = OptionMenu(ventanaInsertarCliente, DistritoSeleccionado, *Distritos)
-        cajaSeleccionDistrito.pack(padx=20, pady=30)
+    cajaSeleccionCanton = OptionMenu(ventanaInsertarCliente, CantonSeleccionado, *Cantones,
+    command=actualizarDistritosMostrar(ProvinciaSeleccionada.get(),CantonSeleccionado.get(),cajaSeleccionDistrito,
+    DistritoSeleccionado))
+    
+    cajaSeleccionProvincia = OptionMenu(ventanaInsertarCliente, ProvinciaSeleccionada, *Provincias, 
+    command=lambda ProvinciaSeleccionada: actualizarCantonesMostrar(ProvinciaSeleccionada, cajaSeleccionCanton, CantonSeleccionado))
+    
+    cajaSeleccionProvincia.pack(padx=20, pady=30)
+    cajaSeleccionCanton.pack(padx=20, pady=0)
+    cajaSeleccionDistrito.pack(padx=20, pady=30)
+    cajaSeleccionCodigo.pack(padx=20, pady=0)
 
-        botonInsertarEstudiante = Button(ventanaInsertarCliente,text="Insertar Estudiante")
-        botonInsertarEstudiante.config(width = "25",fg="black",font= ("Arial", 12))
-        botonInsertarEstudiante.pack(padx=30, pady=0)
-    except:
-        mostrarError(ventanaInsertarCliente,'Error')
+    botonInsertar=crearBoton(ventanaInsertarCliente,'Ingresar Cliente','')
+    
+    #except:
+    #    mostrarError(ventanaInsertarCliente,'Error')
 
-def actualizarFrasesMostrar(provincia, cajaSeleccionFrases, cantones):
-    """
-    Funcionalidad: Actualiza las frases en la caja de seleccion, para que se muestren las que corresponden
-    a la categoría seleccionada.
-    Entradas: CategoriaSeleccionada, cajaSeleccionFrases, fraseSeleccionada
-    Salidas: Actualiza la variable con las frases de la categoría seleccionada 
-    """
-    cantones = conseguirCantones(dicBD,provincia)
-    for canton in cantones:
-        cajaSeleccionFrases["menu"].add_command(label=canton, command=lambda canton=canton: cantones.set(canton))
 #   ----------------------------------------- VENTANA CREAR CLIENTES -------------------------------------------------
 def esEntero(cantidadGrupos):
     """
@@ -283,6 +315,7 @@ def menuRegistrarClientes(pprincipal):
     ventana.title("Crear clientes")
     ventana.geometry("300x170")
     ventana.resizable(0,0)
+    ventana.iconbitmap('icon.ico')
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 100)
     entradasRegistrarClientes(ventana)
@@ -294,41 +327,6 @@ def abrirVentanaPdfEtiqueta():
     Entradas: Na 
     Salidas: reporte pdf 
     """
-    ventanaEtiqueta = crearVentanaSecundaria("Reporte PDF", 350, 160)
-    # Meter una función que haga la etiqueta
-    labelInforme = Label(ventanaEtiqueta, text="Se ha creado el reporte PDF \ncon éxito.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
-
-#   ---------------------------------------- VENTANA ELIMINAR ESTUDIANTE -------------------------------------------------
-def abrirVentanaEliminarEstudiante():
-    """
-    Funcionalidad: Al presionar el botón de eliminar estudiante este crea una ventana con los componentes 
-    para ingresar la información requerida
-    Entradas: Na
-    Salidas: Na ventana creada 
-    """
-    ventanaEliminarEstudiante = crearVentana("Eliminar estudiante")
-    dimensionarVentana(ventanaEliminarEstudiante, 350, 300)
-    colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante)
-    
-def colocarComponentesVentanaEliminarEstudiante(ventanaEliminarEstudiante):
-    """
-    Funcionalidad: Se colocan los componentes (entry y botón) en la ventana de eliminar estudiante 
-    Entradas: Ventana en la que se van a colocar los componentes 
-    Salidas: Na
-    """
-    labelCarnet = Label(ventanaEliminarEstudiante, text="Carnet:")
-    labelCarnet.pack(padx=20, pady=10)
-    labelCarnet.config(font=('Helvatical bold', 12), bg = '#6fabaa')
-    entryCarnet = Entry(ventanaEliminarEstudiante, width=100, justify="center")
-    entryCarnet.config(font=('Helvatical bold', 10))
-    entryCarnet.pack(padx=30, pady=0)
-
-    botonEliminarEstudiante = Button(ventanaEliminarEstudiante,text="Buscar estudiante")
-    botonEliminarEstudiante.config(width = "25",fg="black",font= ("Arial", 12))
-    botonEliminarEstudiante.pack(padx=30, pady=20)
-
 #   ------------------------------------------------- VENTANAS DE REPORTES  -------------------------------------------------
 def abrirVentanaReportes():
     """
@@ -454,18 +452,31 @@ def generarReporteCodigos(codigoSeleccionado,ventanaReporteCliente):
     else: 
         mostrarError(ventanaReporteCliente,"Error, código con formato incorrecto.\nO código no existente")
         
-########################################### CREDENCIALES ##################################################
-def abrirVentanaCredenciales():
-    """
-    Funcionalidad: Genera un las credenciales
-    Entradas: Na 
-    Salidas: N/A
-    """
-    ventanaCredencial = crearVentanaSecundaria("Credenciales", 350, 160)
-    # Crear Función que muestre credenciales
-    labelInforme = Label(ventanaCredencial, text="Las credenciales estan listas.")
-    labelInforme.pack(padx=20, pady=30)
-    labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
+########################################### CREDENCIALES ##################################################    
+def abrirVentanaCredenciales(pprincipal):
+  """
+  Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, se abre o crea otra ventana 
+  que me permite ingresar la información requerida
+  Entradas: Na 
+  Salidas: Na 
+  """
+  ventana = tk.Toplevel(pprincipal)
+  # Configuracion de la ventana secundaria
+  ventana.title("Credenciales")
+  ventana.geometry("400x170")
+  ventana.resizable(0,0)
+  ventana.config(bg='black')
+  ventana.iconbitmap('icon.ico')
+  ventana.lift(pprincipal)  # Posiciona por encima de ventana principal
+  dimensionarVentana(ventana, 800, 500)
+  imagenMario=PhotoImage(file='Mario.png')
+  imagenCamilo=PhotoImage(file='camilo.png')
+  labelMario = Label(ventana,image=imagenMario).place(x=50,y=50)
+  labelCamilo=Label(ventana,image=imagenCamilo).place(x=500,y=50)
+  label = crearLabel(ventana,'Developers','Franklin Gothic Medium',psize=20,pbg='black',pfg='white').place(x=320,y=5)
+  labelC =  crearLabel(ventana,'Camilo Sánchez','Franklin Gothic Medium',psize=20).place(x=510,y=420)
+  labelM = crearLabel(ventana,'Mario Barboza','Franklin Gothic Medium',psize=20).place(x=60,y=420)
+  ventana.mainloop()
 #   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
 def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """
@@ -473,12 +484,12 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     Entradas: La ventana principal 
     Salidas: Na (interfaz)
     """
-    nombresBotones = ("1. Cargar códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
+    nombresBotones = ("1. códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
-    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(), 
-                lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(), 
+    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
+                lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
                 lambda: print("Agregar la funcion"), lambda: print("Agregar la funcion"), 
-                lambda: abrirVentanaReportes(), lambda: abrirVentanaCredenciales())
+                lambda: abrirVentanaReportes(), lambda: abrirVentanaCredenciales(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
     botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
     botonInsertarClientes = crearBoton(ventanaPrincipal, nombresBotones[2], funciones[2])

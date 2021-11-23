@@ -256,6 +256,20 @@ def enviarCorreo(correo,nombre):
     return "Se envió con éxito."
 
 #enviarCorreo('marionetabar1@gmail.com','Mario')
-
-
-
+def crearCaja(pventana, ptexto, pvariable, pvalores, pgrid, pjustify):
+    """
+    Función:    Crea caja de selección para entradas
+    Entradas:
+        pventana (tk.Toplevel)          - Ventana gráfica
+        ptexto, pjustify (str)          - Texto de selección y como justificarlo
+        pvariable (tk.StrVar/tk.IntVar) - Variable donde se almacena entrada
+        pvalores, pgrid (tuple)         - Valores disponibles y como acomodar widgets
+    Salidas:    Retorna el objeto (caja de selección) creado
+    """
+    # Objetos: etiqueta, caja de selección
+    texto = tk.Label(pventana, text= ptexto)
+    select = ttk.Combobox(pventana, textvariable=pvariable, values=pvalores, justify=pjustify, state="readonly")
+    # Posicionamiento grid
+    texto.grid(row= pgrid[0], column= pgrid[1], sticky= pgrid[2])
+    select.grid(row = pgrid[0], column = pgrid[1] + 1)
+    return select
