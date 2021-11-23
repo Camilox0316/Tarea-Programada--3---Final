@@ -166,8 +166,7 @@ def crearReporteCliente(pcedula, plistaObjetos):
             <td> {mostrarDirEspecifica(cliente.obtenerDirEspecifica())} </td>
             <td> {mostrarDirGeneral(cliente.obtenerDirGeneral())} </td> <td> {cliente.obtenerCodigoPostal()} </td>"""
             guardarArchHTML(crearNombreArch(pcedula), tabla+"</tr></table></body></html>")
-            break
-    return ""
+            return ""
 
 def crearReporteCodPostal(pcodigo, plistaObjetos):
     """
@@ -198,7 +197,7 @@ x = crearClientes(400, [], bd)
 for cliente in x:
     cliente.mostrarDatos()
 crearReporteProvincia("San José", x)
-#a = input("Ingresa una cedula, breve: ")
-#crearReporteCliente(a, x)
+a = input("Ingresa una cedula, breve: ")
+crearReporteCliente(a, x)
 a = input("Ingresa un codigo postal: ")
 crearReporteCodPostal(a, x)
