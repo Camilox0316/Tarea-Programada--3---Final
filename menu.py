@@ -14,7 +14,7 @@ from tkinter import messagebox, ttk
 ############################
 
 dicBD = lambda: crearBDCodigos()
-clientes = lambda: leerBinarioLista()
+clientes = lambda: leerBinarioLista("ClientesBD")
 
 ############################
 # Definición de Funciones  # 
@@ -167,18 +167,18 @@ def esEntero(cantidadGrupos):
     -cantidadEstudiantesGrupos(str): Cantidad de estudiantes de cada grupo
     Salida: Lista de listas  
     """
-    try:
-        cantidadGrupos = int(cantidadGrupos)
-        # Meter una Función que cree base de datos y si ya existe que las una 
-        return True 
-    except:
-        return False
+    try: 
+        return int(cantidadGrupos)
+    except: 
+        return None
 
 def validarRegistrarClientes(pventana, pnum):
-    listaClientes = clientes()
-    if not esEntero(pnum):
+    listaClientes, dicCodigos, pnum = clientes(), dicBD(), esEntero(pnum)
+    if pnum == None:
         return mostrarError(pventana, "Solo se deben ingresar números enteros.")
-    grabarBinario("ClientesBD", crearClientes(int(pnum), listaClientes, dicBD))
+    elif pnum == 0:
+        return mostrarError(pventana, "Se debe ingresar un número mayor a 0.")
+    grabarBinario("ClientesBD", crearClientes(pnum, listaClientes, dicCodigos))
     return mostrarInfo(pventana, "Base de datos creada.")
 
 def entradasRegistrarClientes(pventana):
@@ -211,8 +211,9 @@ def validarReporteProvincia(pventana, pprovincia):
 def entradasReporteProvincia(pventana):
     BDCodigos = dicBD()
     provincias = conseguirProvincias(BDCodigos)
-    cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar, provincias, "center")
+    cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar(), provincias, "center")
     cajaProv.set("- Provincias -")
+    
     
 def ventanaReporteProvincia(pventana):
     ventana = tk.Toplevel(pventana)
@@ -221,6 +222,7 @@ def ventanaReporteProvincia(pventana):
     ventana.geometry("490x190")
     ventana.resizable(0,0)
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 350, 100)
     entradasReporteProvincia(ventana)   # Crea y valida entradas
 #---------------------------------------   ETIQUIETA  ---------------------------------------------
 def extenderVentanaEtiqueta(pventana,pcedula):
@@ -331,29 +333,29 @@ def abrirVentanaEnviarCorreo(pprincipal):
     entradaEnviarCorreo(ventana)
 ########################################### CREDENCIALES ##################################################    
 def abrirVentanaCredenciales(pprincipal):
-  """
-  Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, se abre o crea otra ventana 
-  que me permite ingresar la información requerida
-  Entradas: Na 
-  Salidas: Na 
-  """
-  ventana = tk.Toplevel(pprincipal)
-  # Configuracion de la ventana secundaria
-  ventana.title("Credenciales")
-  ventana.geometry("400x170")
-  ventana.resizable(0,0)
-  ventana.config(bg='black')
-  ventana.iconbitmap('icon.ico')
-  ventana.lift(pprincipal)  # Posiciona por encima de ventana principal
-  dimensionarVentana(ventana, 800, 500)
-  imagenMario=PhotoImage(file='Mario.png')
-  imagenCamilo=PhotoImage(file='camilo.png')
-  labelMario = Label(ventana,image=imagenMario).place(x=50,y=50)
-  labelCamilo=Label(ventana,image=imagenCamilo).place(x=500,y=50)
-  label = crearLabel(ventana,'Developers','Franklin Gothic Medium',psize=20,pbg='black',pfg='white').place(x=320,y=5)
-  labelC =  crearLabel(ventana,'Camilo Sánchez','Franklin Gothic Medium',psize=20).place(x=510,y=420)
-  labelM = crearLabel(ventana,'Mario Barboza','Franklin Gothic Medium',psize=20).place(x=60,y=420)
-  ventana.mainloop()
+    """
+    Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, se abre o crea otra ventana 
+    que me permite ingresar la información requerida
+    Entradas: Na 
+    Salidas: Na 
+    """
+    ventana = tk.Toplevel(pprincipal)
+    # Configuracion de la ventana secundaria
+    ventana.title("Credenciales")
+    ventana.geometry("400x170")
+    ventana.resizable(0,0)
+    ventana.config(bg='black')
+    ventana.iconbitmap('icon.ico')
+    ventana.lift(pprincipal)  # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 800, 500)
+    imagenMario=PhotoImage(file='Mario.png')
+    imagenCamilo=PhotoImage(file='camilo.png')
+    labelMario = Label(ventana,image=imagenMario).place(x=50,y=50)
+    labelCamilo=Label(ventana,image=imagenCamilo).place(x=500,y=50)
+    label = crearLabel(ventana,'Developers','Franklin Gothic Medium',psize=20,pbg='black',pfg='white').place(x=320,y=5)
+    labelC =  crearLabel(ventana,'Camilo Sánchez','Franklin Gothic Medium',psize=20).place(x=510,y=420)
+    labelM = crearLabel(ventana,'Mario Barboza','Franklin Gothic Medium',psize=20).place(x=60,y=420)
+    ventana.mainloop()
 #   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
 def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """

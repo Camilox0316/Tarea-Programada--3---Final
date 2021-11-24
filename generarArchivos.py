@@ -197,8 +197,4 @@ x = crearClientes(400, [], bd)
 for cliente in x:
     cliente.mostrarDatos()
 crearReporteProvincia("San José", x)
-a = input("Ingresa una cedula, breve: ")
-crearReporteCliente(a, x)
-a = input("Ingresa un codigo postal: ")
-crearReporteCodPostal(a, x)
 """
