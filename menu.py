@@ -261,12 +261,19 @@ def ventaReporteCedula(pventana):
 ###############################
 # Reporte según código postal #
 ###############################
-#def entradasReporteCodigo(pventana):
+def validarReporteCodigo(pventana, pcodigo):
+    
+def entradasReporteCodigo(pventana):
+    entrada = crearEntradaTexto(pventana, "Ingrese el carné", tk.StringVar(), "center")
+    funcion = lambda: validarReporteCodigo(pventana, entrada.get())
+    boton = crearBoton(pventana, "Generar reporte", funcion)
+
 def ventanaReporteCodigo(pventana):
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según código postal")
     ventana.lift(pventana)
     dimensionarVentana(ventana, 350, 300)
+    entradasReporteCodigo(ventana)
 
 ########################################### CREDENCIALES ##################################################    
 def abrirVentanaCredenciales(pprincipal):

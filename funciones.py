@@ -220,6 +220,14 @@ def encontrarCedula(pcedula, plistaBD):
         if objeto.obtenerCedula == pcedula:
             return True
     return False
+
+def crearListCodDisponibles(plistaObjetos):
+    lista = []
+    for cliente in plistaObjetos:
+        codigo = cliente.obtenerCodigoPostal()
+        if codigo not in lista:
+            lista.append(codigo)
+    return lista
 ####################################
 #          Generar clientes        #
 ####################################
