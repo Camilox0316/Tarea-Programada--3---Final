@@ -25,9 +25,11 @@ def guardarArchXML(parchivoNom, pBaseDatos):
     -pBaseDatos(str): Es la informacion a escribir en el archivo
     Salidas: Na
     """
-    fo = open(f"{parchivoNom}.xml", "w")
+    parchivoNom = f"{parchivoNom}.xml"
+    fo = open(parchivoNom, "w")
     fo.write(pBaseDatos)
     fo.close()
+    os.startfile(parchivoNom)
     return ""
 
 def crearXML(pdictCodigos):

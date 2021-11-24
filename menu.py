@@ -202,28 +202,71 @@ def menuRegistrarClientes(pprincipal):
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 100)
     entradasRegistrarClientes(ventana)
+###########################################   exportar   ##################################################
+def exportarXML():
+    dicCodigos = dicBD()
+    crearXML(dicCodigos)
+    return ""
 ########################################### Reportes     ##################################################   
-def validarReporteProvincia(pventana, pprovincia):
+###########################
+# Reporte según provincia #
+###########################
+def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
+    listaClientes = clientes()
     if pprovincia == -1:
         return mostrarError(pventana, "Por favor escoja una provincia")
-    return crearReporteProvincia(pprovincia)
+    return crearReporteProvincia(pprovinciasTotales[pprovincia], listaClientes)
 
 def entradasReporteProvincia(pventana):
     BDCodigos = dicBD()
     provincias = conseguirProvincias(BDCodigos)
     cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar(), provincias, "center")
     cajaProv.set("- Provincias -")
-    
+    funcion = lambda: validarReporteProvincia(pventana, cajaProv.current(), provincias)
+    boton = crearBoton(pventana, "Crear reporte", funcion)
     
 def ventanaReporteProvincia(pventana):
     ventana = tk.Toplevel(pventana)
     # Configuracion de la ventana secundaria
-    ventana.title("Agregar frase")
-    ventana.geometry("490x190")
+    ventana.title("Reporte según provincia")
+    ventana.geometry("490x300")
     ventana.resizable(0,0)
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
-    dimensionarVentana(ventana, 350, 100)
+    dimensionarVentana(ventana, 350, 200)
     entradasReporteProvincia(ventana)   # Crea y valida entradas
+###########################
+# Reporte según cédula    #
+###########################
+def validarReporteCedula(pventana, pcedula):
+    listaClientes = clientes()
+    pcedula = validarCedula(pcedula)
+    if pcedula == False:
+        return mostrarError(pventana, "El formato de cédula es incorrecto")
+    elif not encontrarCedula(listaClientes):
+        return mostrarInfo(pventana, "La cédula ingresada todavía no ha sido ingresada.")
+    return crearReporteCliente(pcedula, listaClientes)
+
+def entradasReporteCedula(pventana):
+    cedula = crearEntradaTexto(pventana, "Ingrese la cédula", tk.StringVar(), "center")
+    funcion = lambda: validarReporteCedula(pventana, cedula)
+    boton = crearBoton(pventana, "Generar reporte", funcion)
+
+def ventaReporteCedula(pventana):
+    ventana = tk.Toplevel(pventana)
+    ventana.title("Reporte según cédula")
+    ventana.lift(pventana)
+    dimensionarVentana(ventana, 350, 200)
+    entradasReporteCedula(ventana)
+
+###############################
+# Reporte según código postal #
+###############################
+#def entradasReporteCodigo(pventana):
+def ventanaReporteCodigo(pventana):
+    ventana = tk.Toplevel(pventana)
+    ventana.title("Reporte según código postal")
+    ventana.lift(pventana)
+    dimensionarVentana(ventana, 350, 300)
 
 ########################################### CREDENCIALES ##################################################    
 def abrirVentanaCredenciales(pprincipal):
@@ -261,7 +304,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
     funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
                 lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
-                lambda: print("Agregar la funcion"), lambda: print("Agregar la funcion"), 
+                lambda: print("Enviar correo"), lambda: exportarXML(), 
                 lambda: ventanaReporteProvincia(ventanaPrincipal), lambda: abrirVentanaCredenciales(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
     botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
@@ -284,4 +327,5 @@ def iniciarInterfaz():
     dimensionarVentana(ventanaPrincipal, 370, 520)
     colocarBotonesVentanaPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
-iniciarInterfaz()
+#iniciarInterfaz()
+

@@ -126,7 +126,7 @@ def validarCedula(pcedula):
     Entradas: nombre(str): Nombre a validar 
     Salidas: Booleano 
     """
-    if re.match('^[1-9]{1}\d{4}0{1}\d{3}$', pcedula):
+    if re.match('^[1-9]{1}-\d{4}-\d{4}$', pcedula):
         return pcedula
     return False
 
