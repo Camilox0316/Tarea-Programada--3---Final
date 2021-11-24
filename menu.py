@@ -222,7 +222,113 @@ def ventanaReporteProvincia(pventana):
     ventana.resizable(0,0)
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
     entradasReporteProvincia(ventana)   # Crea y valida entradas
+#---------------------------------------   ETIQUIETA  ---------------------------------------------
+def extenderVentanaEtiqueta(pventana,pcedula):
+    """
+    F: Crea las cajas de seleccion y extiende la interfaz
+    E: ventana y cédula
+    S:N/A
+    """
+    #Hacer función que según la cédula cambie a nombre #!!!!!!!!!!!!!!!!!!!!!!!!
+    nombre = 'Mario Barboza Artavia'
+    lista =  ['especifica','general','codigo']
 
+    opcion1 =  [lista[0]]
+    especificaS = StringVar(pventana) 
+    especificaS.set(lista[0])
+    cajaSeleccionEspecificas = OptionMenu(pventana, especificaS, *opcion1).pack(padx=20, pady=30)
+
+    opcion2 =  [lista[1]]
+    generalS = StringVar(pventana) 
+    generalS.set(lista[1])
+    cajaSeleccionGeneral = OptionMenu(pventana, generalS, *opcion2).pack(padx=20, pady=30)
+
+    opcion3 =  [lista[2]]
+    codigoS = StringVar(pventana) 
+    codigoS.set(lista[2])
+    cajaSeleccionCodigo = OptionMenu(pventana, generalS, *opcion3).pack(padx=20, pady=30)
+
+    funcion = lambda:creaPdf(nombre,especificaS.get(),generalS.get(),codigoS.get())
+    #mostrarInfo(pventana,f'Etiqueta de: {nombre}, creada ') # poner información que ya se creo la etiqueta
+    boton = crearBoton(pventana,'Generar Etiqueta',funcion)
+def validarCedulaIEtiqueta(pventana, pcedula):
+    """
+    F: Valida la cedula si esta repetida o si la no tiene formato correcto
+    E: ventana y cedula(str)
+    S:N/A
+    """
+    if validarCedula(pcedula)==False:
+        return mostrarError(pventana, "La cédula tiene un formato inválido.")
+    return extenderVentanaEtiqueta(pventana,pcedula)
+
+def entradasEtiqueta(pventana):
+    """
+    F: ingresa a la ventana los botones y cajas de seleccion 
+    E: ventana
+    S: N/A
+    """
+    cedula = crearEntradaTexto(pventana, "Ingrese su número de cédula: ", tk.StringVar(), "center")
+    funcion = lambda: validarCedulaIEtiqueta(pventana, cedula.get())
+    botonIngresar = crearBoton(pventana, "Buscar Info", funcion)
+
+def abrirVentanaPdfEtiqueta(pprincipal):
+    """
+    Funcionalidad: Genera una etiqueta
+    Entradas: Na 
+    Salidas: reporte pdf 
+    """
+    ventana = tk.Toplevel(pprincipal)
+    ventana.title('Ventana Generar Etiqueta')
+    ventana.geometry('500x500')
+    ventana.resizable(0,0)
+    ventana.iconbitmap('icon.ico')
+    ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 300, 420)
+    entradasEtiqueta(ventana)
+# ---------------------------------------   ENVIAR CORREO ----------------------------------------------------
+def enviarCorreoInterfaz(pventana,pcedula):
+    """
+    F: cambia datos y envía correo
+    E: cedula(str)
+    S:N/A
+    """
+    try:
+        nombre = ''#Funcion para cambiar a correo a gmail.
+        correo = ''#funcion que de cedula cambie a nombre de la persona
+        enviarCorreo(correo,nombre)
+        return mostrarInfo(pventana,'Se ha enviado Correo')
+    except:
+        return  mostrarError(pventana,'El correo no se pudo enviar')
+
+def validarCedulaCorreo(pventana, pcedula):
+    """
+    F: Valida la cedula si esta repetida o si la no tiene formato correcto
+    E: ventana y cedula(str)
+    S:N/A
+    """
+    if validarCedula(pcedula)==False:
+        return mostrarError(pventana, "La cédula tiene un formato inválido.")
+    return enviarCorreoInterfaz(pventana,pcedula)
+
+def entradaEnviarCorreo(pventana):
+    """
+    F: ingresa a la ventana los botones y cajas de seleccion 
+    E: ventana
+    S: N/A
+    """
+    cedula = crearEntradaTexto(pventana, "Ingrese su número de cédula: ", tk.StringVar(), "center")
+    funcion = lambda: validarCedulaCorreo(pventana, cedula.get())
+    botonIngresar = crearBoton(pventana, "Buscar Info", funcion)
+
+def abrirVentanaEnviarCorreo(pprincipal):
+    ventana = tk.Toplevel(pprincipal)
+    ventana.title('Enviar Correos')
+    ventana.geometry('500x500')
+    ventana.resizable(0,0)
+    ventana.iconbitmap('icon.ico')
+    ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 300, 100)
+    entradaEnviarCorreo(ventana)
 ########################################### CREDENCIALES ##################################################    
 def abrirVentanaCredenciales(pprincipal):
   """
@@ -257,10 +363,10 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """
     nombresBotones = ("1. códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
-    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
+    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: print('Agregar Función'), 
                 lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
-                lambda: print("Agregar la funcion"), lambda: print("Agregar la funcion"), 
-                lambda: ventanaReporteProvincia(ventanaPrincipal), lambda: abrirVentanaCredenciales(ventanaPrincipal))
+                lambda: abrirVentanaEnviarCorreo(ventanaPrincipal), lambda: print("Agregar la funcion"), 
+                lambda: print(''), lambda: abrirVentanaCredenciales(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
     botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
     botonInsertarClientes = crearBoton(ventanaPrincipal, nombresBotones[2], funciones[2])
