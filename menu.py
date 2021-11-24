@@ -189,27 +189,37 @@ def menuRegistrarClientes(pprincipal):
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 100)
     entradasRegistrarClientes(ventana)
+###########################################   exportar   ##################################################
+def exportarXML():
+    dicCodigos = dicBD()
+    crearXML(dicCodigos)
+    return ""
 ########################################### Reportes     ##################################################   
-def validarReporteProvincia(pventana, pprovincia):
+###########################
+# Reporte según provincia #
+###########################
+def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
+    listaClientes = clientes()
     if pprovincia == -1:
         return mostrarError(pventana, "Por favor escoja una provincia")
-    return crearReporteProvincia(pprovincia)
+    return crearReporteProvincia(pprovinciasTotales[pprovincia], listaClientes)
 
 def entradasReporteProvincia(pventana):
     BDCodigos = dicBD()
     provincias = conseguirProvincias(BDCodigos)
     cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar(), provincias, "center")
     cajaProv.set("- Provincias -")
-    
+    funcion = lambda: validarReporteProvincia(pventana, cajaProv.current(), provincias)
+    boton = crearBoton(pventana, "Crear reporte", funcion)
     
 def ventanaReporteProvincia(pventana):
     ventana = tk.Toplevel(pventana)
     # Configuracion de la ventana secundaria
-    ventana.title("Agregar frase")
-    ventana.geometry("490x190")
+    ventana.title("Reporte según provincia")
+    ventana.geometry("490x300")
     ventana.resizable(0,0)
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
-    dimensionarVentana(ventana, 350, 100)
+    dimensionarVentana(ventana, 350, 200)
     entradasReporteProvincia(ventana)   # Crea y valida entradas
 #---------------------------------------   ETIQUIETA  ---------------------------------------------
 def extenderVentanaEtiqueta(pventana,pcedula):
@@ -260,6 +270,46 @@ def entradasEtiqueta(pventana):
     cajaCli.set("- Clientes -")
     funcion = lambda: validarCedulaIEtiqueta(pventana, tomarHastaCaracter(cajaCli.get(),'>'))
     botonIngresar = crearBoton(pventana, "Ver Info", funcion)
+###########################
+# Reporte según cédula    #
+###########################
+def validarReporteCedula(pventana, pcedula):
+    listaClientes = clientes()
+    pcedula = validarCedula(pcedula)
+    if pcedula == False:
+        return mostrarError(pventana, "El formato de cédula es incorrecto")
+    elif not encontrarCedula(listaClientes):
+        return mostrarInfo(pventana, "La cédula ingresada todavía no ha sido ingresada.")
+    return crearReporteCliente(pcedula, listaClientes)
+
+def entradasReporteCedula(pventana):
+    cedula = crearEntradaTexto(pventana, "Ingrese la cédula", tk.StringVar(), "center")
+    funcion = lambda: validarReporteCedula(pventana, cedula)
+    boton = crearBoton(pventana, "Generar reporte", funcion)
+
+def ventaReporteCedula(pventana):
+    ventana = tk.Toplevel(pventana)
+    ventana.title("Reporte según cédula")
+    ventana.lift(pventana)
+    dimensionarVentana(ventana, 350, 200)
+    entradasReporteCedula(ventana)
+
+###############################
+# Reporte según código postal #
+###############################
+def validarReporteCodigo(pventana, pcodigo):
+    
+def entradasReporteCodigo(pventana):
+    entrada = crearEntradaTexto(pventana, "Ingrese el carné", tk.StringVar(), "center")
+    funcion = lambda: validarReporteCodigo(pventana, entrada.get())
+    boton = crearBoton(pventana, "Generar reporte", funcion)
+
+def ventanaReporteCodigo(pventana):
+    ventana = tk.Toplevel(pventana)
+    ventana.title("Reporte según código postal")
+    ventana.lift(pventana)
+    dimensionarVentana(ventana, 350, 300)
+    entradasReporteCodigo(ventana)
 
 def abrirVentanaPdfEtiqueta(pprincipal):
     """
@@ -375,3 +425,5 @@ def iniciarInterfaz():
 iniciarInterfaz()
 for elem in clientes():
     print(elem.mostrarDatos())
+#iniciarInterfaz()
+
