@@ -1,13 +1,13 @@
 ############################
 # Importación de librerias # 
 ############################
+from pickle import POP
 from tkinter import *
 from tkinter.font import BOLD
 from typing import Sized
 from funciones import *
 from archivos import *
 from tkinter import messagebox, ttk
-import os
 
 ############################
 #    Variables globales    # 
@@ -67,6 +67,7 @@ def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=
     entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify)
     entrada.pack()
     return entrada
+
 def crearVentana(titulo):
     """
     Funcionalidad: Formato general para crear una nueva ventana 
@@ -106,21 +107,6 @@ def crearVentanaSecundaria(pventana, titulo, pancho, palto):
     ventanaSecundaria = dimensionarVentana(ventanaSecundaria, pancho, palto)
     return ventanaSecundaria  
 
-def dimensionarVentana(ventana, anchoVentana, altoVentana):
-    """
-    Funcionalidad: Ajusta el tamaño de la ventana según las medidas dadas
-    Entradas: 
-    -ventana: La ventana que se quiere dimensionar 
-    -anchoVentana: El ancho que va a poseer la ventana 
-    -altoVentana: El alto que va a poseer la ventana
-    Salidas: Na 
-    """
-    anchoPantalla = ventana.winfo_screenwidth() # Toma el ancho de la pantalla de la computadora 
-    altoPantalla = ventana.winfo_screenheight() # Toma el alto de la pantalla de la computadora
-    posicionVentanaX = (anchoPantalla/2) - (anchoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje X
-    posicionVentanaY = (altoPantalla/2) - (altoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje Y
-    ventana.geometry('%dx%d+%d+%d' % (anchoVentana,altoVentana,posicionVentanaX,posicionVentanaY))
-
 def mostrarError(pventana, pmensaje):
     """
     Función:    Despliega interfaz con mensaje de error
@@ -150,7 +136,6 @@ def confirmarTk(pventana, pmensaje):
     return messagebox.askokcancel(title="Atención", message=pmensaje, parent=pventana)
 
 #   -------------------------------------------- VENTANA CARGAR CODIGOS -------------------------------------------------
-
 def abrirVentanaCargarCodigos(pventana):
     """
     Funcionalidad: Al presionar el botón de extraer frases se abre esta abre una ventana que muestra un mensaje
@@ -172,6 +157,7 @@ def entradasRegistrarClientes(pventana):
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
     funcion = lambda: validarRegistrarClientes(pventana, cantidadClientes.get())
     botonIngresar = crearBoton(pventana, "Crear", funcion)
+
 def abrirVentanaIngresarCliente(pventana):
     """
     Funcionalidad: Al presionar el botón de insertar estudiante se abre esta ventana, la cual contiene cajas de texto
@@ -189,6 +175,7 @@ def abrirVentanaIngresarCliente(pventana):
     dimensionarVentana(ventanaInsertarCliente, 350, 600)
     colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
     ventanaInsertarCliente.mainloop()
+
 def actualizarCantonesMostrar(provincia, cajaSeleccionP,cantonSeleccionado):
     """
     Funcionalidad: Actualiza las frases en la caja de seleccion, para que se muestren las que corresponden
@@ -321,46 +308,45 @@ def menuRegistrarClientes(pprincipal):
     entradasRegistrarClientes(ventana)
     
 ############################################## ETIQUIETA  ###############################################
-def abrirVentanaPdfEtiqueta():
+def abrirVentanaPdfEtiqueta(pventana):
     """
     Funcionalidad: Genera una etiqueta
     Entradas: Na 
     Salidas: reporte pdf 
     """
+    return ""
 #   ------------------------------------------------- VENTANAS DE REPORTES  -------------------------------------------------
-def abrirVentanaReportes():
-    """
-    Funcionalidad: Al presionar el botón de reportes en la ventana principal, se crea una ventana que contiene
-    los botones para generar reportes según la especificación
-    Entradas: Na
-    Salidas: Na
-    """ 
-    ventanaReportes = crearVentanaSecundaria("Reportes", 350, 320)
-    colocarBotonesVentanaReportes(ventanaReportes)
-    ventanaReportes.mainloop()
 def colocarBotonesVentanaReportes(ventanaReportes):
     """
     Funcionalidad: Coloca los botones en la ventana de reportes 
     Entradas: VentanaReportes 
     Salidas:Na
     """
-    botonProvincia = Button(ventanaReportes,text="Por Provincia", command=abrirVentanaReportesProvincia)
-    botonProvincia.config(width = "25",fg="black",font= ("Arial", 12),bg='white')
-    botonProvincia.pack(padx=30, pady=10)
-
-    botonCliente = Button(ventanaReportes,text="Por Cliente", command=abrirVentanaReporteCliente)
-    botonCliente.config(width = "25",fg="black",font= ("Arial", 12),bg='white')
-    botonCliente.pack(padx=30, pady=10)
-
-    botonCodigos = Button(ventanaReportes,text="Por Código", command=abrirVentanaReporteCodigos)
-    botonCodigos.config(width = "25",fg="black",font= ("Arial", 12),bg='white')
-    botonCodigos.pack(padx=30, pady=10)
+    reporteProvincias = crearBoton(ventanaReportes, "Reporte segun provincia", abrirVentanaReportesProvincia(ventanaReportes))
+    reporteCliente = crearBoton(ventanaReportes, "Reporte según cliente", abrirVentanaReporteCliente())
+    reporteCodigo = crearBoton(ventanaReportes, "Reporte según código", abrirVentanaReporteCodigos())
 
     botonRegresar = Button(ventanaReportes,text="Regresar")
     botonRegresar.config(width = "25",fg="black",font= ("Arial", 12),bg='white', command=ventanaReportes.destroy)
     botonRegresar.pack(padx=30, pady=10)
+
+def abrirVentanaReportes(pventana):
+    """
+    Funcionalidad: Al presionar el botón de reportes en la ventana principal, se crea una ventana que contiene
+    los botones para generar reportes según la especificación
+    Entradas: Na
+    Salidas: Na
+    """ 
+    ventanaReportes = tk.Toplevel(pventana)
+    ventanaReportes.title("Reportes")
+    ventanaReportes.resizable(0,0)
+    ventanaReportes.lift(pventana)
+    dimensionarVentana(ventanaReportes, 350, 100)
+    colocarBotonesVentanaReportes(ventanaReportes)
+    ventanaReportes.mainloop()
+
 ##########################################   Reporte 1   #############################################
-def abrirVentanaReportesProvincia():
+def abrirVentanaReportesProvincia(pventana):
     """
     Funcionalidad: Crea una ventana que contiene una caja de seleccion de los grupos existentes 
     Entradas: Na 
@@ -368,7 +354,7 @@ def abrirVentanaReportesProvincia():
     """
     try:
         Provincias =  conseguirProvincias(dicBD)
-        ventanaReportesProvincia = crearVentanaSecundaria("Reportes por Provincia", 350, 110)
+        ventanaReportesProvincia = crearVentanaSecundaria(pventana, "Reportes por Provincia", 350, 110)
         grupoSeleccionado = StringVar(ventanaReportesProvincia)
         grupoSeleccionado.set("Seleccione una Provincia")
         cajaSeleccionProvincia = OptionMenu(ventanaReportesProvincia, grupoSeleccionado, *Provincias)
@@ -386,7 +372,7 @@ def generarReportePorClientesProvincia(grupoSeleccionado):
     Entradas: Provincia(str)
     Salidas: reporte html 
     """
-    ventanaReportesProvincia = crearVentanaSecundaria("Reporte Cliente", 350, 110)
+    ventanaReportesProvincia = crearVentanaSecundaria(grupoSeleccionado, "Reporte Cliente", 350, 110)
     if grupoSeleccionado != "Seleccione una Provincia": # va a ser la provincia
         # Genera html de los clientes de una provincia 
         labelInforme = Label(ventanaReportesProvincia, text=f"Se ha creado el reporte de clientes {grupoSeleccionado} \ncon éxito.")
@@ -397,14 +383,14 @@ def generarReportePorClientesProvincia(grupoSeleccionado):
         labelInforme.pack(padx=20, pady=30)
         labelInforme.config(font=('Helvatical bold', 13), bg = '#153a7a')
 ##########################################   Reporte 2   #############################################
-def abrirVentanaReporteCliente():
+def abrirVentanaReporteCliente(pventana):
     """
     Funcionalidad: Crea una ventana con la caja de seleccion para que se ingrese la categoria 
     de la que se quiere hacer el reporte
     Entradas: Na
     Salidas: ventana 
     """
-    ventanaReporteCliente = crearVentanaSecundaria("Reportes por categoría de frase", 350, 110)
+    ventanaReporteCliente = crearVentanaSecundaria(pventana, "Reportes por categoría de frase", 350, 110)
     entryCedula = Entry(ventanaReporteCliente, width=100, justify="center")
     entryCedula.config(font=('Helvatical bold', 10))
     entryCedula.pack(padx=30, pady=0)
@@ -489,7 +475,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
                 lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
                 lambda: print("Agregar la funcion"), lambda: print("Agregar la funcion"), 
-                lambda: abrirVentanaReportes(), lambda: abrirVentanaCredenciales(ventanaPrincipal))
+                lambda: abrirVentanaReportes(ventanaPrincipal), lambda: abrirVentanaCredenciales(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
     botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
     botonInsertarClientes = crearBoton(ventanaPrincipal, nombresBotones[2], funciones[2])

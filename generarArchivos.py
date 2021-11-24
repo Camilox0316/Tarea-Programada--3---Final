@@ -190,7 +190,7 @@ def crearReporteCodPostal(pcodigo, plistaObjetos):
             <td> {mostrarDirGeneral(cliente.obtenerDirGeneral())} </td> <td> {codPostal} </td>"""
     guardarArchHTML(crearNombreArch(pcodigo), tabla+"</tr></table></body></html>")
     return ""
-
+"""
 bd = crearBDCodigos()
 crearXML(bd)
 x = crearClientes(400, [], bd)
@@ -201,3 +201,4 @@ a = input("Ingresa una cedula, breve: ")
 crearReporteCliente(a, x)
 a = input("Ingresa un codigo postal: ")
 crearReporteCodPostal(a, x)
+"""
