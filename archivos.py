@@ -43,22 +43,21 @@ def leerTXT(filePath):
     except:
         return ""
         
-def lee (nomArchLeer):
+def leerBinarioLista(nomArchLeer):
     """
     F: lee archivo
     E: str nombrede archivo
     S: retorna la lista
     """
-    lista=[]
     try:
         f=open(nomArchLeer,"rb")
-        dicc = pickle.load(f)
+        lista = pickle.load(f)
         f.close()
-        return dicc
-    except:
         return lista
+    except:
+        return []
 
-def graba(nomArchGrabar,lista):
+def grabarBinario(nomArchGrabar,lista):
     """
     F: crea archivo
     E: str y lo que desee añadir a lista

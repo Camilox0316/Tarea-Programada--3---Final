@@ -15,6 +15,8 @@ from claseCliente import *
 from random import paretovariate, randint
 import re, names, datetime, smtplib
 from tkinter import StringVar
+from random import randint
+import re, names, datetime, smtplib
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -236,7 +238,6 @@ def crearClientes(pcantidad, plistaBD, pdiccCodigos):
             clienteActu = Cliente()
             clienteActu.asignarCedula(cedula), clienteActu.asignarNombre(nombre), clienteActu.asignarDirEspecifica(generarDirEspecifica()),
             clienteActu.asignarDirGeneral(codigoDireccion[1]), clienteActu.asignarCodigoPostal(codigoDireccion[0]), clienteActu.asignarCorreo(correo)
-            clienteActu.mostrarDatos()
             plistaBD.append(clienteActu)
             pcantidad -= 1
     return plistaBD
@@ -256,4 +257,22 @@ def enviarCorreo(correo,nombre):
     server.sendmail('correoscrmariocamilo@gmail.com',correo,message)
     server.quit()
     return "Se envió con éxito."
+
 #enviarCorreo('marionetabar1@gmail.com','Mario')
+def crearCaja(pventana, ptexto, pvariable, pvalores, pgrid, pjustify):
+    """
+    Función:    Crea caja de selección para entradas
+    Entradas:
+        pventana (tk.Toplevel)          - Ventana gráfica
+        ptexto, pjustify (str)          - Texto de selección y como justificarlo
+        pvariable (tk.StrVar/tk.IntVar) - Variable donde se almacena entrada
+        pvalores, pgrid (tuple)         - Valores disponibles y como acomodar widgets
+    Salidas:    Retorna el objeto (caja de selección) creado
+    """
+    # Objetos: etiqueta, caja de selección
+    texto = tk.Label(pventana, text= ptexto)
+    select = ttk.Combobox(pventana, textvariable=pvariable, values=pvalores, justify=pjustify, state="readonly")
+    # Posicionamiento grid
+    texto.grid(row= pgrid[0], column= pgrid[1], sticky= pgrid[2])
+    select.grid(row = pgrid[0], column = pgrid[1] + 1)
+    return select

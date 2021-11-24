@@ -140,7 +140,8 @@ class Cliente():
         f"Dir espe: {self.obtenerDirEspecifica()}\n"
         f"Dir general: {self.obtenerDirGeneral()}\n"
         f"codigo postal: {self.obtenerCodigoPostal()}\n"
-        f"correo: {self.obtenerCorreo()}\n")
+        f"correo: {self.obtenerCorreo()}\n"
+        f"Demostración que es un objeto: {type(self)}")
         return ""
     
 """
