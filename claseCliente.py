@@ -133,7 +133,22 @@ class Cliente():
         Salidas: Str(); es el correo del usuario
         """
         return self.correo
-    
+    def obtenerDatos(self):
+        """
+        Función: Obtiene los datos y los inserta en tupla
+        Entradas: N/A
+        Salidas: tuple(); datos
+        """
+        return (self.obtenerNombre(),self.obtenerDirEspecifica(),self.obtenerDirGeneral(),self.obtenerCodigoPostal(),
+        self.obtenerCorreo())
+
+    def obtenerCedNom(self):
+        """
+        Función: Obtiene los datos de  nombre y cédula
+        Entradas: N/A
+        Salidas: tuple(); datos
+        """
+        return (self.obtenerNombre(),self.obtenerCedula())
     def mostrarDatos(self): ##### Esta funcion es mantequilla, es para ver como guarda a los clientes XD #####
         print(f"\ncedula: {self.obtenerCedula()}\n"
         f"Nombre completo: {self.obtenerNombre()}\n"

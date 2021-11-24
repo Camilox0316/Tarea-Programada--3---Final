@@ -75,7 +75,7 @@ def creaPdf(nombre,especifica,general,codigo):
     pdf.image('stamp.png',180,68,50,50)
     for elem in (200,100,0):
         pdf.image('correo.png',elem,150,80)
-    pdf.output((f'{nombre}.pdf'))
+    pdf.output((f'{(nombre.split())[0]}.pdf'))
     return 'Archivo Creado'
 #creaPdf('Mario Barboza Artavia','Alajuela, San Ramon, San Ramón ','AV: 2 C: 2 #55 ' ,'1101010')
 ######################################### HTML ########################################################

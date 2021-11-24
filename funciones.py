@@ -95,7 +95,52 @@ def verificarArchivo(nombreArchivo):
     Salidas: Bool
     """
     return leerTXT(nombreArchivo) == ""
+def esEntero(cantidadGrupos):
+    """
+    Funcionamiento: Permite ingresar la cantidad de grupos y la cantidad de estudiantes por grupo
+    en la ventana de insertar n grupos 
+    Entrada: 
+    -cantidadGrupos(str): Cantidad de grupos a ingresar 
+    -cantidadEstudiantesGrupos(str): Cantidad de estudiantes de cada grupo
+    Salida: Lista de listas  
+    """
+    try: 
+        return int(cantidadGrupos)
+    except: 
+        return None
 
+def validar60(plista):
+    lista = []
+    for elem in plista:
+        elem = esEntero(elem)
+        if elem==None :
+            return None
+        lista.append(elem)
+    for elemento in lista:
+        if elemento not in range(1,61):
+            return False   
+    return f'AV{lista[0]} CA{lista[1]} #{lista[2]}.'
+
+def deCedulaATupla(plista,pcedula):
+    """
+    F:retorna una tupla con los datos de la persona y valida si existe la cédula
+    E:lista(list) cedula(str)
+    S: bool o tuple
+    """
+    for cliente in plista:
+        if cliente.obtenerCedula()==pcedula:
+            return cliente.obtenerDatos()
+    return False
+def validarCorreo(pcorreo):
+    """
+    F: Cambia correo a un correo gmail
+    E:correo(str)
+    S: correo gmail (str)
+    """
+    if re.match("^[a-zñ]{5,15}(@gmail.com){1}$",pcorreo):
+        return pcorreo
+    return False
+    
 def validarNombre(pnombre):
     """
     Función:    Determina si el valor ingresado coincide con el formato de nombre , no permite números
@@ -129,10 +174,9 @@ def validarCedula(pcedula):
     Entradas: nombre(str): Nombre a validar 
     Salidas: Booleano 
     """
-    if re.match('^[1-9]{1}\d{4}0{1}\d{3}$', pcedula):
+    if re.match('^[1-9]{1}-{1}\d{4}-{1}\d{4}$', pcedula):
         return pcedula
     return False
-
 ####################################
 #        Utilidades extras         #
 ####################################
@@ -241,6 +285,13 @@ def crearClientes(pcantidad, plistaBD, pdiccCodigos):
             plistaBD.append(clienteActu)
             pcantidad -= 1
     return plistaBD
+def agregarCliente(pcedula,pnombre,pespecifica,pgeneral,pcodigo,pcorreo,plista):
+    clienteActu = Cliente()
+    clienteActu.asignarCedula(pcedula), clienteActu.asignarNombre(pnombre), clienteActu.asignarDirEspecifica(pespecifica),
+    clienteActu.asignarDirGeneral(pgeneral), clienteActu.asignarCodigoPostal(pcodigo), clienteActu.asignarCorreo(pcorreo)
+    plista.append(clienteActu)
+    grabarBinario('ClientesBD',plista)
+    return ''
 
 def enviarCorreo(correo,nombre):
     """
@@ -248,7 +299,7 @@ def enviarCorreo(correo,nombre):
     Entradas: correo
     Salidas: NA  
     """
-    message = f'Para informarle a {nombre}.\nLa entrega de su paquete es: {str(datetime.date.today() + datetime.timedelta(days=1))}.'
+    message = f'Para informarle a {mostrarNombreCliente(nombre)}.\nLa entrega de su paquete es: {str(datetime.date.today() + datetime.timedelta(days=1))}.'
     subject = 'Entrega de paquete'
     message = 'Subject: {}\n\n{}'.format(subject, message)
     server = smtplib.SMTP('smtp.gmail.com',587)
@@ -258,7 +309,6 @@ def enviarCorreo(correo,nombre):
     server.quit()
     return "Se envió con éxito."
 
-#enviarCorreo('marionetabar1@gmail.com','Mario')
 def crearCaja(pventana, ptexto, pvariable, pvalores, pgrid, pjustify):
     """
     Función:    Crea caja de selección para entradas
@@ -276,3 +326,23 @@ def crearCaja(pventana, ptexto, pvariable, pvalores, pgrid, pjustify):
     texto.grid(row= pgrid[0], column= pgrid[1], sticky= pgrid[2])
     select.grid(row = pgrid[0], column = pgrid[1] + 1)
     return select
+
+def listaCedNom(plista):
+    lista = []
+    for cliente in plista:
+        cliente = cliente.obtenerCedNom()
+        lista.append(f'{cliente[1]}>{mostrarNombreCliente(cliente[0])}')
+    return lista
+    
+def tomarHastaCaracter(ppalabra, pcaracter, ppos='n'):
+    """
+    Funcionamiento: Corta un string hasta el caracter indicado en pcaracter
+    Entradas:
+    -ppalabra(str): Es la cadena a cortar
+    -pcaracter(str): Es el caracter que pondrá el límite a la cadena
+    -pos(str): Si es "n" se utiliza .find(), de otra forma se utiliza .rfind()
+    Salidas: Es el string Ya cortado
+    """
+    if ppos.lower() == "n":
+        return ppalabra[:ppalabra.find(str(pcaracter))]
+    return ppalabra[:ppalabra.rfind(str(pcaracter))]

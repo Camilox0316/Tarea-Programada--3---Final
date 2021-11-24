@@ -357,8 +357,6 @@ def entradasEtiqueta(pventana):
     funcion = lambda: validarCedulaIEtiqueta(pventana, cedula.get())
     botonIngresar = crearBoton(pventana, "Buscar Info", funcion)
 
-
-############################################## ETIQUIETA  ###############################################
 def abrirVentanaPdfEtiqueta(pprincipal):
     """
     Funcionalidad: Genera una etiqueta

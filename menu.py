@@ -9,6 +9,7 @@ from funciones import *
 from archivos import *
 from tkinter import messagebox, ttk
 
+
 ############################
 #    Variables globales    # 
 ############################
@@ -50,7 +51,7 @@ def crearLabel(pventana, ptexto,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black'
     etiqueta.config(font=(pfont,psize),bg=pbg,fg=pfg)
     return etiqueta
 
-def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black'):
+def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black',pstate=NORMAL):
     """
     Función:    Crea etiquetas y cajas de texto para una entrada
     Entradas:
@@ -64,7 +65,7 @@ def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=
     texto = tk.Label(pventana, text= ptexto)
     texto.config(font=(pfont,psize),bg=pbg,fg=pfg)
     texto.pack()
-    entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify)
+    entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify,state=pstate)
     entrada.pack()
     return entrada
 
@@ -158,20 +159,6 @@ def abrirVentanaCargarCodigos(pventana):
     return mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
 
 #   ----------------------------------------- VENTANA CREAR CLIENTES -------------------------------------------------
-def esEntero(cantidadGrupos):
-    """
-    Funcionamiento: Permite ingresar la cantidad de grupos y la cantidad de estudiantes por grupo
-    en la ventana de insertar n grupos 
-    Entrada: 
-    -cantidadGrupos(str): Cantidad de grupos a ingresar 
-    -cantidadEstudiantesGrupos(str): Cantidad de estudiantes de cada grupo
-    Salida: Lista de listas  
-    """
-    try: 
-        return int(cantidadGrupos)
-    except: 
-        return None
-
 def validarRegistrarClientes(pventana, pnum):
     listaClientes, dicCodigos, pnum = clientes(), dicBD(), esEntero(pnum)
     if pnum == None:
@@ -231,27 +218,25 @@ def extenderVentanaEtiqueta(pventana,pcedula):
     E: ventana y cédula
     S:N/A
     """
-    #Hacer función que según la cédula cambie a nombre #!!!!!!!!!!!!!!!!!!!!!!!!
-    nombre = 'Mario Barboza Artavia'
-    lista =  ['especifica','general','codigo']
+    clientes = leerBinarioLista('ClientesBD')
+    tupla = deCedulaATupla(clientes,pcedula)
+    if tupla == False:
+        return mostrarError(pventana,'La cédula no se encuentra registrada')
+    nombre = mostrarNombreCliente(tupla[0])
+    lista =  [tupla[1],mostrarDirGeneral(tupla[2]),tupla[3]]
+    entrada = tk.StringVar()
+    entrada.set(lista[0])
+    especificaS = tk.Entry(pventana,textvariable=entrada,state='readonly').pack(padx=10,pady=10)
 
-    opcion1 =  [lista[0]]
-    especificaS = StringVar(pventana) 
-    especificaS.set(lista[0])
-    cajaSeleccionEspecificas = OptionMenu(pventana, especificaS, *opcion1).pack(padx=20, pady=30)
+    entrada1 = tk.StringVar()
+    entrada1.set(lista[1])
+    generalS = tk.Entry(pventana,textvariable=entrada1,state='readonly').pack(padx=10,pady=10)
 
-    opcion2 =  [lista[1]]
-    generalS = StringVar(pventana) 
-    generalS.set(lista[1])
-    cajaSeleccionGeneral = OptionMenu(pventana, generalS, *opcion2).pack(padx=20, pady=30)
+    entrada2 = tk.StringVar()
+    entrada2.set(lista[2])
+    codigosS = tk.Entry(pventana,textvariable=entrada2,state='readonly').pack(padx=10,pady=10)
 
-    opcion3 =  [lista[2]]
-    codigoS = StringVar(pventana) 
-    codigoS.set(lista[2])
-    cajaSeleccionCodigo = OptionMenu(pventana, generalS, *opcion3).pack(padx=20, pady=30)
-
-    funcion = lambda:creaPdf(nombre,especificaS.get(),generalS.get(),codigoS.get())
-    #mostrarInfo(pventana,f'Etiqueta de: {nombre}, creada ') # poner información que ya se creo la etiqueta
+    funcion = lambda:(creaPdf(nombre,lista[0],lista[1],lista[2]),mostrarInfo(pventana,f'Etiqueta de: {nombre}, creada ') )
     boton = crearBoton(pventana,'Generar Etiqueta',funcion)
 def validarCedulaIEtiqueta(pventana, pcedula):
     """
@@ -260,7 +245,7 @@ def validarCedulaIEtiqueta(pventana, pcedula):
     S:N/A
     """
     if validarCedula(pcedula)==False:
-        return mostrarError(pventana, "La cédula tiene un formato inválido.")
+        return mostrarError(pventana, "Ingrese un valor en la caja de selección.")
     return extenderVentanaEtiqueta(pventana,pcedula)
 
 def entradasEtiqueta(pventana):
@@ -269,9 +254,12 @@ def entradasEtiqueta(pventana):
     E: ventana
     S: N/A
     """
-    cedula = crearEntradaTexto(pventana, "Ingrese su número de cédula: ", tk.StringVar(), "center")
-    funcion = lambda: validarCedulaIEtiqueta(pventana, cedula.get())
-    botonIngresar = crearBoton(pventana, "Buscar Info", funcion)
+    listaGen = leerBinarioLista('ClientesBD')
+    listaClientes= listaCedNom(listaGen)
+    cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
+    cajaCli.set("- Clientes -")
+    funcion = lambda: validarCedulaIEtiqueta(pventana, tomarHastaCaracter(cajaCli.get(),'>'))
+    botonIngresar = crearBoton(pventana, "Ver Info", funcion)
 
 def abrirVentanaPdfEtiqueta(pprincipal):
     """
@@ -285,32 +273,26 @@ def abrirVentanaPdfEtiqueta(pprincipal):
     ventana.resizable(0,0)
     ventana.iconbitmap('icon.ico')
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
-    dimensionarVentana(ventana, 300, 420)
+    dimensionarVentana(ventana, 300, 300)
     entradasEtiqueta(ventana)
 # ---------------------------------------   ENVIAR CORREO ----------------------------------------------------
-def enviarCorreoInterfaz(pventana,pcedula):
-    """
-    F: cambia datos y envía correo
-    E: cedula(str)
-    S:N/A
-    """
-    try:
-        nombre = ''#Funcion para cambiar a correo a gmail.
-        correo = ''#funcion que de cedula cambie a nombre de la persona
-        enviarCorreo(correo,nombre)
-        return mostrarInfo(pventana,'Se ha enviado Correo')
-    except:
-        return  mostrarError(pventana,'El correo no se pudo enviar')
-
 def validarCedulaCorreo(pventana, pcedula):
     """
     F: Valida la cedula si esta repetida o si la no tiene formato correcto
     E: ventana y cedula(str)
     S:N/A
     """
+    lista = deCedulaATupla(clientes(),pcedula)
     if validarCedula(pcedula)==False:
         return mostrarError(pventana, "La cédula tiene un formato inválido.")
-    return enviarCorreoInterfaz(pventana,pcedula)
+    elif lista == False:
+        return mostrarError(pventana, "Cédula no registrada.")
+    else:
+        try:
+            enviarCorreo(lista[-1],lista[0])
+            return mostrarInfo(pventana,'Se ha enviado Correo')
+        except: 
+            return mostrarError(pventana,'El correo no se pudo enviar')
 
 def entradaEnviarCorreo(pventana):
     """
@@ -379,7 +361,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     botonCredenciales = crearBoton(ventanaPrincipal, nombresBotones[7], funciones[7])
     botonSalir = crearBoton(ventanaPrincipal, nombresBotones[-1], ventanaPrincipal.destroy)
     return botonCargarCodigos, botonRegistraCliente, botonInsertarClientes, botonCrearEtiqueta, botonEnviarCorreo, botonExportarCodigos, botonCrearReportes, botonCredenciales
-
+    
 def iniciarInterfaz():
     """
     Funcionalidad: Crea la ventana principal que contendrá los botones principales 
@@ -391,3 +373,5 @@ def iniciarInterfaz():
     colocarBotonesVentanaPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
 iniciarInterfaz()
+for elem in clientes():
+    print(elem.mostrarDatos())
