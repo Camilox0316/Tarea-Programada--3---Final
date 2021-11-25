@@ -298,6 +298,7 @@ def ventaReporteCedula(pventana):
 # Reporte según código postal #
 ###############################
 def validarReporteCodigo(pventana, pcodigo):
+    1
     
 def entradasReporteCodigo(pventana):
     entrada = crearEntradaTexto(pventana, "Ingrese el carné", tk.StringVar(), "center")
