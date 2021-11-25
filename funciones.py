@@ -180,6 +180,15 @@ def validarCedula(pcedula):
 ####################################
 #        Utilidades extras         #
 ####################################
+def mostrarDirGeneral(plista):
+    """
+    Función: Muesta la dirección general de un cliente
+    Entradas:
+    -plista(list): Es la lista que contiene la direccion general
+    Salidas: Str(); es la direccion general en formato para el usuario
+    """
+    return f"{plista[0]} > {plista[1]} > {plista[2]}"
+
 def mostrarNombreCliente(ptupla):
     """
     Función: Da el nombre de un cliente a partir de su tupla
@@ -275,6 +284,15 @@ def crearListCodDisponibles(plistaObjetos):
         if codigo not in lista:
             lista.append(codigo)
     return lista
+
+def crearListProvDisp(plistaObjetos):
+    lista = []
+    for cliente in plistaObjetos:
+        prov = cliente.obtenerDirGeneral()[0]
+        if prov not in lista:
+            lista.append(prov)
+    return lista
+
 ####################################
 #          Generar clientes        #
 ####################################
@@ -341,7 +359,15 @@ def listaCedNom(plista):
         cliente = cliente.obtenerCedNom()
         lista.append(f'{cliente[1]}>{mostrarNombreCliente(cliente[0])}')
     return lista
-    
+
+def listaCodDirEspe(plistaObjetos):
+    lista = []
+    for cliente in plistaObjetos:
+        cliente = f"{cliente.obtenerCodigoPostal()} : {mostrarDirGeneral(cliente.obtenerDirGeneral())}"
+        if cliente not in lista:
+            lista.append(cliente)
+    return lista
+
 def tomarHastaCaracter(ppalabra, pcaracter, ppos='n'):
     """
     Funcionamiento: Corta un string hasta el caracter indicado en pcaracter

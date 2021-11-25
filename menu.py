@@ -206,8 +206,8 @@ def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
     return crearReporteProvincia(pprovinciasTotales[pprovincia], listaClientes)
 
 def entradasReporteProvincia(pventana):
-    BDCodigos = dicBD()
-    provincias = conseguirProvincias(BDCodigos)
+    listClientes = clientes()
+    provincias = crearListProvDisp(listClientes)
     cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar(), provincias, "center")
     cajaProv.set("- Provincias -")
     funcion = lambda: validarReporteProvincia(pventana, cajaProv.current(), provincias)
@@ -268,6 +268,7 @@ def entradasEtiqueta(pventana):
     listaGen = leerBinarioLista('ClientesBD')
     listaClientes= listaCedNom(listaGen)
     cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
+    cajaCli.config(width=60)
     cajaCli.set("- Clientes -")
     funcion = lambda: validarCedulaIEtiqueta(pventana, tomarHastaCaracter(cajaCli.get(),'>'))
     botonIngresar = crearBoton(pventana, "Ver Info", funcion)
@@ -298,14 +299,21 @@ def ventaReporteCedula(pventana):
 ###############################
 # Reporte según código postal #
 ###############################
-#def validarReporteCodigo(pventana, pcodigo):
+def validarReporteCodigo(pventana, pcodigo, plistaCodDisp):
+    listaClientes = clientes()
+    if pcodigo == -1:
+        return mostrarError(pventana, "Por favor escoja un código")
+    crearReporteCodPostal(tomarHastaCaracter(plistaCodDisp[pcodigo], ":").strip(), listaClientes)
+    return ""
     
 def entradasReporteCodigo(pventana):
     listaClientes = clientes()
-    caja = crearCaja(pventana, "Códigos disponibles", tk.StringVar(), crearListCodDisponibles(listaClientes), "center")
+    codigosActu = listaCodDirEspe(listaClientes)
+    caja = crearCaja(pventana, "Códigos disponibles", tk.StringVar(), codigosActu, "center")
+    caja.config(width=60)
     caja.set("- Códigos -")
-    #funcion = lambda: validarReporteCodigo(pventana, entrada.get())
-    boton = crearBoton(pventana, "Generar reporte", lambda:print("aaaaaaaaaa"))
+    funcion = lambda: validarReporteCodigo(pventana, caja.current(), codigosActu)
+    boton = crearBoton(pventana, "Generar reporte", funcion)
 
 def ventanaReporteCodigo(pventana):
     ventana = tk.Toplevel(pventana)
