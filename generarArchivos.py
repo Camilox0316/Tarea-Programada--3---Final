@@ -13,6 +13,7 @@ Versión:              Python 3.9.6
 import xml.etree.cElementTree as ET
 from funciones import *
 from fpdf import FPDF
+import os
 
 ##############################################################
 #####              Definición de Funciones               #####
@@ -81,15 +82,6 @@ def creaPdf(nombre,especifica,general,codigo):
     return 'Archivo Creado'
 #creaPdf('Mario Barboza Artavia','Alajuela, San Ramon, San Ramón ','AV: 2 C: 2 #55 ' ,'1101010')
 ######################################### HTML ########################################################
-def mostrarDirGeneral(plista):
-    """
-    Función: Muesta la dirección general de un cliente
-    Entradas:
-    -plista(list): Es la lista que contiene la direccion general
-    Salidas: Str(); es la direccion general en formato para el usuario
-    """
-    return f"{plista[0]} > {plista[1]} > {plista[2]}"
-
 def mostrarDirEspecifica(pstring):
     """
     Función: Muesta la dirección específica de un cliente

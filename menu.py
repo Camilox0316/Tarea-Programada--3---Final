@@ -110,6 +110,7 @@ def dimensionarVentana(ventana, anchoVentana, altoVentana):
     -altoVentana: El alto que va a poseer la ventana
     Salidas: Na 
     """
+    ventana.resizable(0,0)
     anchoPantalla = ventana.winfo_screenwidth() # Toma el ancho de la pantalla de la computadora 
     altoPantalla = ventana.winfo_screenheight() # Toma el alto de la pantalla de la computadora
     posicionVentanaX = (anchoPantalla/2) - (anchoVentana/2) # Al dividir y restar, está ajustando la ventana al centro en eje X
@@ -205,8 +206,8 @@ def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
     return crearReporteProvincia(pprovinciasTotales[pprovincia], listaClientes)
 
 def entradasReporteProvincia(pventana):
-    BDCodigos = dicBD()
-    provincias = conseguirProvincias(BDCodigos)
+    listClientes = clientes()
+    provincias = crearListProvDisp(listClientes)
     cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar(), provincias, "center")
     cajaProv.set("- Provincias -")
     funcion = lambda: validarReporteProvincia(pventana, cajaProv.current(), provincias)
@@ -267,6 +268,7 @@ def entradasEtiqueta(pventana):
     listaGen = leerBinarioLista('ClientesBD')
     listaClientes= listaCedNom(listaGen)
     cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
+    cajaCli.config(width=60)
     cajaCli.set("- Clientes -")
     funcion = lambda: validarCedulaIEtiqueta(pventana, tomarHastaCaracter(cajaCli.get(),'>'))
     botonIngresar = crearBoton(pventana, "Ver Info", funcion)
@@ -284,7 +286,7 @@ def validarReporteCedula(pventana, pcedula):
 
 def entradasReporteCedula(pventana):
     cedula = crearEntradaTexto(pventana, "Ingrese la cédula", tk.StringVar(), "center")
-    funcion = lambda: validarReporteCedula(pventana, cedula)
+    funcion = lambda: validarReporteCedula(pventana, cedula.get())
     boton = crearBoton(pventana, "Generar reporte", funcion)
 
 def ventaReporteCedula(pventana):
@@ -297,21 +299,46 @@ def ventaReporteCedula(pventana):
 ###############################
 # Reporte según código postal #
 ###############################
-def validarReporteCodigo(pventana, pcodigo):
-    1
+def validarReporteCodigo(pventana, pcodigo, plistaCodDisp):
+    listaClientes = clientes()
+    if pcodigo == -1:
+        return mostrarError(pventana, "Por favor escoja un código")
+    crearReporteCodPostal(tomarHastaCaracter(plistaCodDisp[pcodigo], ":").strip(), listaClientes)
+    return ""
     
 def entradasReporteCodigo(pventana):
-    entrada = crearEntradaTexto(pventana, "Ingrese el carné", tk.StringVar(), "center")
-    funcion = lambda: validarReporteCodigo(pventana, entrada.get())
+    listaClientes = clientes()
+    codigosActu = listaCodDirEspe(listaClientes)
+    caja = crearCaja(pventana, "Códigos disponibles", tk.StringVar(), codigosActu, "center")
+    caja.config(width=60)
+    caja.set("- Códigos -")
+    funcion = lambda: validarReporteCodigo(pventana, caja.current(), codigosActu)
     boton = crearBoton(pventana, "Generar reporte", funcion)
 
 def ventanaReporteCodigo(pventana):
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según código postal")
     ventana.lift(pventana)
-    dimensionarVentana(ventana, 350, 300)
+    dimensionarVentana(ventana, 400, 250)
     entradasReporteCodigo(ventana)
+#######################
+# Submenu de reportes #
+#######################
+def botonesMenuReportes(pventana):
+    funcionProvincia = lambda: ventanaReporteProvincia(pventana)
+    funcionCedula = lambda: ventaReporteCedula(pventana)
+    funcionCodigo = lambda: ventanaReporteCodigo(pventana)
+    botonProvincia = crearBoton(pventana, "Reportes Según Provincia", funcionProvincia)
+    botonCedula = crearBoton(pventana, "Reporte según cédula", funcionCedula)
+    botonCodigo = crearBoton(pventana, "Reporte según código", funcionCodigo)
 
+def subMenuReportes(pventana):
+    ventana = tk.Toplevel(pventana)
+    ventana.title("Menú de reportes")
+    ventana.lift(pventana)
+    dimensionarVentana(ventana, 300, 200)
+    botonesMenuReportes(ventana)
+    
 def abrirVentanaPdfEtiqueta(pprincipal):
     """
     Funcionalidad: Genera una etiqueta
@@ -375,7 +402,6 @@ def abrirVentanaCredenciales(pprincipal):
     ventana = tk.Toplevel(pprincipal)
     # Configuracion de la ventana secundaria
     ventana.title("Credenciales")
-    ventana.geometry("400x170")
     ventana.resizable(0,0)
     ventana.config(bg='black')
     ventana.iconbitmap('icon.ico')
@@ -398,10 +424,10 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """
     nombresBotones = ("1. códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
-    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: print('Agregar Función'), 
+    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: print('Agregar Función registrar clientes'), 
                 lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
-                lambda: abrirVentanaEnviarCorreo(ventanaPrincipal), lambda: print("Agregar la funcion"), 
-                lambda: print(''), lambda: abrirVentanaCredenciales(ventanaPrincipal))
+                lambda: abrirVentanaEnviarCorreo(ventanaPrincipal), lambda: exportarXML(), 
+                lambda: subMenuReportes(ventanaPrincipal), lambda: abrirVentanaCredenciales(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
     botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
     botonInsertarClientes = crearBoton(ventanaPrincipal, nombresBotones[2], funciones[2])
