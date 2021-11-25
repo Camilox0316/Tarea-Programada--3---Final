@@ -453,4 +453,3 @@ iniciarInterfaz()
 for elem in clientes():
     print(elem.mostrarDatos())
 #iniciarInterfaz()
-
