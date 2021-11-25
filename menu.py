@@ -9,6 +9,7 @@ from funciones import *
 from archivos import *
 from tkinter import messagebox, ttk
 
+
 ############################
 #    Variables globales    # 
 ############################
@@ -50,7 +51,7 @@ def crearLabel(pventana, ptexto,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black'
     etiqueta.config(font=(pfont,psize),bg=pbg,fg=pfg)
     return etiqueta
 
-def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black'):
+def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=12,pbg='#f0f0f0',pfg='black',pstate=NORMAL):
     """
     Función:    Crea etiquetas y cajas de texto para una entrada
     Entradas:
@@ -64,7 +65,7 @@ def crearEntradaTexto(pventana, ptexto, pvariable, pjustify,pfont='arial',psize=
     texto = tk.Label(pventana, text= ptexto)
     texto.config(font=(pfont,psize),bg=pbg,fg=pfg)
     texto.pack()
-    entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify)
+    entrada = ttk.Entry(pventana, textvariable= pvariable, justify = pjustify,state=pstate)
     entrada.pack()
     return entrada
 
@@ -159,20 +160,6 @@ def abrirVentanaCargarCodigos(pventana):
     return mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
 
 #   ----------------------------------------- VENTANA CREAR CLIENTES -------------------------------------------------
-def esEntero(cantidadGrupos):
-    """
-    Funcionamiento: Permite ingresar la cantidad de grupos y la cantidad de estudiantes por grupo
-    en la ventana de insertar n grupos 
-    Entrada: 
-    -cantidadGrupos(str): Cantidad de grupos a ingresar 
-    -cantidadEstudiantesGrupos(str): Cantidad de estudiantes de cada grupo
-    Salida: Lista de listas  
-    """
-    try: 
-        return int(cantidadGrupos)
-    except: 
-        return None
-
 def validarRegistrarClientes(pventana, pnum):
     listaClientes, dicCodigos, pnum = clientes(), dicBD(), esEntero(pnum)
     if pnum == None:
@@ -235,6 +222,55 @@ def ventanaReporteProvincia(pventana):
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 200)
     entradasReporteProvincia(ventana)   # Crea y valida entradas
+#---------------------------------------   ETIQUIETA  ---------------------------------------------
+def extenderVentanaEtiqueta(pventana,pcedula):
+    """
+    F: Crea las cajas de seleccion y extiende la interfaz
+    E: ventana y cédula
+    S:N/A
+    """
+    clientes = leerBinarioLista('ClientesBD')
+    tupla = deCedulaATupla(clientes,pcedula)
+    if tupla == False:
+        return mostrarError(pventana,'La cédula no se encuentra registrada')
+    nombre = mostrarNombreCliente(tupla[0])
+    lista =  [tupla[1],mostrarDirGeneral(tupla[2]),tupla[3]]
+    entrada = tk.StringVar()
+    entrada.set(lista[0])
+    especificaS = tk.Entry(pventana,textvariable=entrada,state='readonly').pack(padx=10,pady=10)
+
+    entrada1 = tk.StringVar()
+    entrada1.set(lista[1])
+    generalS = tk.Entry(pventana,textvariable=entrada1,state='readonly').pack(padx=10,pady=10)
+
+    entrada2 = tk.StringVar()
+    entrada2.set(lista[2])
+    codigosS = tk.Entry(pventana,textvariable=entrada2,state='readonly').pack(padx=10,pady=10)
+
+    funcion = lambda:(creaPdf(nombre,lista[0],lista[1],lista[2]),mostrarInfo(pventana,f'Etiqueta de: {nombre}, creada ') )
+    boton = crearBoton(pventana,'Generar Etiqueta',funcion)
+def validarCedulaIEtiqueta(pventana, pcedula):
+    """
+    F: Valida la cedula si esta repetida o si la no tiene formato correcto
+    E: ventana y cedula(str)
+    S:N/A
+    """
+    if validarCedula(pcedula)==False:
+        return mostrarError(pventana, "Ingrese un valor en la caja de selección.")
+    return extenderVentanaEtiqueta(pventana,pcedula)
+
+def entradasEtiqueta(pventana):
+    """
+    F: ingresa a la ventana los botones y cajas de seleccion 
+    E: ventana
+    S: N/A
+    """
+    listaGen = leerBinarioLista('ClientesBD')
+    listaClientes= listaCedNom(listaGen)
+    cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
+    cajaCli.set("- Clientes -")
+    funcion = lambda: validarCedulaIEtiqueta(pventana, tomarHastaCaracter(cajaCli.get(),'>'))
+    botonIngresar = crearBoton(pventana, "Ver Info", funcion)
 ###########################
 # Reporte según cédula    #
 ###########################
@@ -295,6 +331,58 @@ def subMenuReportes(pventana):
     dimensionarVentana(ventana, 300, 200)
     botonesMenuReportes(ventana)
     
+def abrirVentanaPdfEtiqueta(pprincipal):
+    """
+    Funcionalidad: Genera una etiqueta
+    Entradas: Na 
+    Salidas: reporte pdf 
+    """
+    ventana = tk.Toplevel(pprincipal)
+    ventana.title('Ventana Generar Etiqueta')
+    ventana.geometry('500x500')
+    ventana.resizable(0,0)
+    ventana.iconbitmap('icon.ico')
+    ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 300, 300)
+    entradasEtiqueta(ventana)
+# ---------------------------------------   ENVIAR CORREO ----------------------------------------------------
+def validarCedulaCorreo(pventana, pcedula):
+    """
+    F: Valida la cedula si esta repetida o si la no tiene formato correcto
+    E: ventana y cedula(str)
+    S:N/A
+    """
+    lista = deCedulaATupla(clientes(),pcedula)
+    if validarCedula(pcedula)==False:
+        return mostrarError(pventana, "La cédula tiene un formato inválido.")
+    elif lista == False:
+        return mostrarError(pventana, "Cédula no registrada.")
+    else:
+        try:
+            enviarCorreo(lista[-1],lista[0])
+            return mostrarInfo(pventana,'Se ha enviado Correo')
+        except: 
+            return mostrarError(pventana,'El correo no se pudo enviar')
+
+def entradaEnviarCorreo(pventana):
+    """
+    F: ingresa a la ventana los botones y cajas de seleccion 
+    E: ventana
+    S: N/A
+    """
+    cedula = crearEntradaTexto(pventana, "Ingrese su número de cédula: ", tk.StringVar(), "center")
+    funcion = lambda: validarCedulaCorreo(pventana, cedula.get())
+    botonIngresar = crearBoton(pventana, "Buscar Info", funcion)
+
+def abrirVentanaEnviarCorreo(pprincipal):
+    ventana = tk.Toplevel(pprincipal)
+    ventana.title('Enviar Correos')
+    ventana.geometry('500x500')
+    ventana.resizable(0,0)
+    ventana.iconbitmap('icon.ico')
+    ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
+    dimensionarVentana(ventana, 300, 100)
+    entradaEnviarCorreo(ventana)
 ########################################### CREDENCIALES ##################################################    
 def abrirVentanaCredenciales(pprincipal):
     """
@@ -328,9 +416,9 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """
     nombresBotones = ("1. códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
-    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
+    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: print('Agregar Función registrar clientes'), 
                 lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
-                lambda: print("Enviar correo"), lambda: exportarXML(), 
+                lambda: abrirVentanaEnviarCorreo(ventanaPrincipal), lambda: exportarXML(), 
                 lambda: subMenuReportes(ventanaPrincipal), lambda: abrirVentanaCredenciales(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], funciones[0])
     botonRegistraCliente = crearBoton(ventanaPrincipal, nombresBotones[1], funciones[1])
@@ -342,7 +430,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     botonCredenciales = crearBoton(ventanaPrincipal, nombresBotones[7], funciones[7])
     botonSalir = crearBoton(ventanaPrincipal, nombresBotones[-1], ventanaPrincipal.destroy)
     return botonCargarCodigos, botonRegistraCliente, botonInsertarClientes, botonCrearEtiqueta, botonEnviarCorreo, botonExportarCodigos, botonCrearReportes, botonCredenciales
-
+    
 def iniciarInterfaz():
     """
     Funcionalidad: Crea la ventana principal que contendrá los botones principales 
@@ -354,4 +442,7 @@ def iniciarInterfaz():
     colocarBotonesVentanaPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
 iniciarInterfaz()
+for elem in clientes():
+    print(elem.mostrarDatos())
+#iniciarInterfaz()
 
