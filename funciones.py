@@ -10,6 +10,7 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
+from tkinter.constants import E
 from archivos import *
 from claseCliente import *
 from random import paretovariate, randint
@@ -62,7 +63,10 @@ def conseguirCantones(pdcit, pprovincia):
     -pprovincia(str): Es el nombre de la provincia a buscar 
     Salidas: Lista de los cantones de la provincia indicada
     """
-    return list(pdcit[pprovincia].keys())
+    try:
+        return list(pdcit[pprovincia].keys())
+    except:
+        return None
 
 def conseguirDistritos(pdict, pprovincia, pcanton):
     """
@@ -73,7 +77,10 @@ def conseguirDistritos(pdict, pprovincia, pcanton):
     -pcanton(str): es le canton a sacar distritos
     Salidas: Lista de los distritos del canton indicado
     """
-    return list(pdict[pprovincia][pcanton].keys())
+    try:
+        return list(pdict[pprovincia][pcanton].keys())
+    except:
+        return None
 
 def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
     """
@@ -108,6 +115,19 @@ def esEntero(cantidadGrupos):
         return int(cantidadGrupos)
     except: 
         return None
+def validarDirEspecifica(string):
+    """
+    Funcionalidad: verifica si la direccion específica esta bien
+    Entradas: Str
+    Salidas: Bool o None
+    """
+    lista = string.split() # Lo convierte en lista
+    if len(lista)!= 3:
+        return False
+    for elem in lista:
+        if esEntero(elem) == None:
+            return None
+    return f'CA{lista[0]} AV{lista[1]} #{lista[2]}'
 
 def validar60(plista):
     lista = []
@@ -380,3 +400,7 @@ def tomarHastaCaracter(ppalabra, pcaracter, ppos='n'):
     if ppos.lower() == "n":
         return ppalabra[:ppalabra.find(str(pcaracter))]
     return ppalabra[:ppalabra.rfind(str(pcaracter))]
+####################################
+#          Insertar Cliente        #
+####################################
+
