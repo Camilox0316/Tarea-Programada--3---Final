@@ -149,7 +149,7 @@ def validar60(plista):
     for elemento in lista:
         if elemento not in range(1,61):
             return False   
-    return f'AV{lista[0]} CA{lista[1]} #{lista[2]}.'
+    return f'CA{lista[0]} AV{lista[1]}  #{lista[2]}.'
 
 def deCedulaATupla(plista,pcedula):
     """

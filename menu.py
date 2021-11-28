@@ -150,71 +150,79 @@ def confirmarTk(pventana, pmensaje):
     return messagebox.askokcancel(title="Atención", message=pmensaje, parent=pventana)
 
 #   -------------------------------------------- VENTANA CARGAR CODIGOS -------------------------------------------------
+def cargarCodPostales():
+    dicBD.update(crearBDCodigos())
+    return dicBD
+
 def abrirVentanaCargarCodigos(pventana, pboton, pfuncion):
     """
     Funcionalidad: Al presionar el botón de extraer frases se abre esta abre una ventana que muestra un mensaje
     Entradas: Na 
     Salidas: Na
     """
-    codigosPostalesDinamico = crearBDCodigos()
+    codigosPostalesDinamico = cargarCodPostales()
     if codigosPostalesDinamico == False:
         return mostrarError(pventana, "Error\nNo se ha encontrado el archivo que contiene los códigos postales.\nEl archivo se debe llamar: BDPostalCR.txt.")
     pboton.config(state="disabled")
     pfuncion()
     mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
-    dicBD.update(codigosPostalesDinamico)
     return ""
 #------------------------------------------ INSERTAR CLIENTE -------------------------------------------------
-def deNumAProvincia(pnum,pventana):
+def deNumAProvincia(pnum, pcombo):
     """
     Función:    Busca una provincia a partir del número de la caja de selección
     Entradas:   pventana ,pprovincia(Str),pcanton(str),pnum(int)
     Salidas:    Retorna una provincia str
     """
     if pnum == -1:
-        return mostrarError(pventana,'Por favor elija una provincia')
-    lista = ['San José','Alajuela','Cartago','Heredia','Guanacaste','Puntarenas','Limón']
+        pcombo.config(state="disabled")
+        return ""
+    lista = conseguirProvincias(dicBD)
     return lista[pnum]
 
-def deProvinciaACantonAux(pprovincia,pnum,pventana):
+def deProvinciaACantonAux(pprovincia,pnum, pcombo):
     """
     Función:    Busca un cantón a partir de la provincia y número de caja
     Entradas:   pventana ,pprovincia(Str),pnum(int)
     Salidas:    Retorna un cantón str
     """
     if pnum == -1:
-        return mostrarError(pventana,'Por favor elija un cantón')
-    pprovincia = deNumAProvincia(pprovincia,pventana)
+        pcombo.config(state="disabled")
+        return ""
+    pprovincia = deNumAProvincia(pprovincia, pcombo)
     lista=conseguirCantones(dicBD,pprovincia)
     return lista[pnum]
 
-def sacarDistrito(pprovincia,pcanton,pnum,pventana):
+def sacarDistrito(pprovincia,pcanton,pnum, pcombo):
     """
     Función:    Busca un distrito a partir del número de la caja de selección
     Entradas:   pventana ,pprovincia(Str),pcanton(str),pnum(int)
     Salidas:    Retorna un distrito str
     """
     if pnum == -1:
-        return mostrarError(pventana,'Por favor elija un Distrito')
-    provincia = deNumAProvincia(pprovincia,pventana)
-    pcanton= deProvinciaACantonAux(pprovincia,pcanton,pventana)
+        pcombo.config(state="disabled")
+        return ""
+    provincia = deNumAProvincia(pprovincia,pcombo)
+    pcanton= deProvinciaACantonAux(pprovincia,pcanton,pcombo)
     lista=conseguirDistritos(dicBD,provincia,pcanton)
     return lista[pnum]
 #----------------------------------------INSERTAR CLIENTE--------------------------------------------
 def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcodigo,pcorreo):
-    listaClientes = leerBinarioLista('ClientesBD')
+    listaClientes = clientes()
     listaGen = [pprovin,pcan,pdis]
+    pespe = validar60(pespe)
+    pnombre = validarNombre(pnombre)
     if validarCedula(pcedula)== False:
         return mostrarError(pventana, "La cédula no cumple con el formato.")
     elif encontrarCedula(pcedula,listaClientes):
         return mostrarError(pventana, "La cédula ya se encuentra registrada.")
-    elif validarNombre(pnombre)== None:
+    elif pnombre == None:
         return mostrarError(pventana, "En el nombre debe ingresar 3 valores.")
-    elif validarNombre(pnombre)== False:
+    elif pnombre == False:
         return mostrarError(pventana, "El nombre debe contener solo letras.")
-    elif validarDirEspecifica(pespe)==False :
-        return mostrarError(pventana, "En la dirrección específica debe ingresar 3 valores.")
-    elif validarDirEspecifica(pespe)== None:
+    elif pespe==False :
+        return mostrarError(pventana, "En la dirección específica debe ingresar 3 valores.")
+    elif pespe == None:
         return mostrarError(pventana, "deben ser 3 números Calle, Avenida, Número.")
     elif validarGeneral(listaGen)== 1:
         return mostrarError(pventana, "Escoja una provincia.")
@@ -239,7 +247,7 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
     print(clienteN.mostrarDatos())
     listaClientes.append(clienteN)
     grabarBinario('ClientesBD',listaClientes)
-    return mostrarInfo(pventana, "Estudiante Ingresado Satisfactoriamente.")
+    return mostrarInfo(pventana, "Cliente Ingresado Satisfactoriamente.")
 
 def entradasRegistrarCliente(pventana):
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
@@ -258,16 +266,17 @@ def cajasGeneral(pventana):
     caja3 = crearCaja(pventana, "Distrito: ", tk.StringVar(), None, "center")
     caja4 = crearCaja(pventana, "Código: ", tk.StringVar(), None, "center")
     funcion1 = lambda: ( caja2.config(state = "normal"), caja2.set("— Cantones Disponibles —"))
+    #funcion2 = lambda: (caja2.config(values=conseguirCantones(dicBD, provincias[caja1.current()])), caja3.config(state="readonly"), 
+    #caja3.set("- Distritos Disponibles-"))
+    funcion2 = lambda: (caja2.config( values = conseguirCantones(dicBD,deNumAProvincia( caja1.current(),caja2)))
+    ,caja3.config(state = "disabled"),caja3.set("— Distritos Disponibles —"))
 
-    funcion2 = lambda: (caja2.config( values = conseguirCantones(dicBD,deNumAProvincia( caja1.current(),pventana)))
-    ,caja3.config(state = "normal"),caja3.set("— Distritos Disponibles —"))
+    funcion3 = lambda: (caja3.config(values= conseguirDistritos(dicBD,deNumAProvincia(caja1.current(),caja3)
+    ,deProvinciaACantonAux(caja1.current(),caja2.current(),caja3))),caja4.config(state = "disabled"),caja4.set("— Código —"))
 
-    funcion3 = lambda: (caja3.config(values= conseguirDistritos(dicBD,deNumAProvincia(caja1.current(),pventana)
-    ,deProvinciaACantonAux(caja1.current(),caja2.current(),pventana))),caja4.config(state = "normal"),caja4.set("— Código —"))
-
-    funcion4 = lambda:(caja4.config(values= conseguirCodigo(dicBD,deNumAProvincia(caja1.current(),pventana),
-    deProvinciaACantonAux(caja1.current(),caja2.current(),pventana),
-    sacarDistrito(caja1.current(),caja2.current(),caja3.current(),pventana))))
+    funcion4 = lambda:(caja4.config(values= conseguirCodigo(dicBD,deNumAProvincia(caja1.current(),caja4),
+    deProvinciaACantonAux(caja1.current(),caja2.current(), caja4),
+    sacarDistrito(caja1.current(),caja2.current(),caja3.current(),caja4))))
     # Config: Activa caja  al seleccionar caja 1
     caja1.set("— Provincias —")
     caja1.config(width = "72", postcommand = funcion1)
@@ -294,7 +303,7 @@ def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     funcion = lambda:validarRegistrarCliente(ventanaInsertarCliente,cedula.get(),nombre.get(),uEspecifica.get(),cajaPro.current(),cajaCan.current(),cajaDis.current(),cajaCod.current(),correo.get())
     botonInsertar=crearBoton(ventanaInsertarCliente,'Ingresar Cliente',funcion)
     
-def abrirVentanaIngresarCliente(pventana):
+def abrirVentanaIngresarCliente(pventana, pfuncion):
     """
     Funcionalidad: Al presionar el botón de insertar estudiante se abre esta ventana, la cual contiene cajas de texto
     menú de selección para ingresar los datos.
@@ -310,25 +319,27 @@ def abrirVentanaIngresarCliente(pventana):
     ventanaInsertarCliente.lift(pventana)  # Posiciona por encima de ventana principal
     dimensionarVentana(ventanaInsertarCliente, 350, 700)
     colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
+    pfuncion()
     ventanaInsertarCliente.mainloop()
 #   ----------------------------------------- VENTANA CREAR CLIENTES -------------------------------------------------
-def validarRegistrarClientes(pventana, pnum):
+def validarRegistrarClientes(pventana, pnum, pfuncion):
     listaClientes, dicCodigos, pnum = clientes(), dicBD, esEntero(pnum)
     if pnum == None:
         return mostrarError(pventana, "Solo se deben ingresar números enteros.")
     elif pnum == 0:
         return mostrarError(pventana, "Se debe ingresar un número mayor a 0.")
     grabarBinario("ClientesBD", crearClientes(pnum, listaClientes, dicCodigos))
+    pfuncion()
     return mostrarInfo(pventana, "Base de datos creada.")
 
-def entradasRegistrarClientes(pventana):
+def entradasRegistrarClientes(pventana, pfuncion):
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
-    funcion = lambda: validarRegistrarClientes(pventana, cantidadClientes.get())
+    funcion = lambda: validarRegistrarClientes(pventana, cantidadClientes.get(), pfuncion)
     botonIngresar = crearBoton(pventana, "Crear", funcion)
 
-def menuRegistrarClientes(pprincipal):
+def menuRegistrarClientes(pprincipal, pfuncion):
     """
-    Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, se abre o crea otra ventana 
+    Funcionalidad: Al presionar el botón de insertar n grupos en la ventana principal, smenuRegistrarClientese abre o crea otra ventana 
     que me permite ingresar la información requerida
     Entradas: Na 
     Salidas: Na 
@@ -341,7 +352,8 @@ def menuRegistrarClientes(pprincipal):
     ventana.iconbitmap('icon.ico')
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 100)
-    entradasRegistrarClientes(ventana)
+    entradasRegistrarClientes(ventana, pfuncion)
+    
 ###########################################   exportar   ##################################################
 def exportarXML():
     dicCodigos = dicBD
@@ -568,6 +580,23 @@ def abrirVentanaCredenciales(pprincipal):
     labelM = crearLabel(ventana,'Mario Barboza','Franklin Gothic Medium',psize=20).place(x=60,y=420)
     ventana.mainloop()
 #   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
+def activarBotones(pBotones, pdicBD=dicBD):
+    activar2 = list(pBotones[:2]) + [pBotones[4]]
+    print(f"clientes: {clientes()}")
+    for boton in pBotones:
+        if pdicBD != {} and clientes() != []:
+            boton.config(state="normal")
+            print(False)
+        elif pdicBD != {} and clientes()==[]:
+            for boton2 in activar2:
+                boton2.config(state="normal")
+            print(None)
+            return ""
+        else:
+            boton.config(state="disabled")
+            print(True)
+    return ""
+
 def colocarBotonesPrincipal(ventanaPrincipal):
     """
     Funcionalidad: Coloca los botones en la ventana principal 
@@ -576,8 +605,8 @@ def colocarBotonesPrincipal(ventanaPrincipal):
     """
     nombresBotones = ("1. códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
-    funciones = (lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
-                lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
+    funciones = (lambda: None, 
+                lambda: None, lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
                 lambda: abrirVentanaEnviarCorreo(ventanaPrincipal), lambda: exportarXML(), 
                 lambda: subMenuReportes(ventanaPrincipal))
     botonCargarCodigos = crearBoton(ventanaPrincipal, nombresBotones[0], None)
@@ -591,22 +620,6 @@ def colocarBotonesPrincipal(ventanaPrincipal):
     botonSalir = crearBoton(ventanaPrincipal, nombresBotones[-1], ventanaPrincipal.destroy)
     return botonCargarCodigos, botonRegistraCliente, botonInsertarClientes, botonCrearEtiqueta, botonEnviarCorreo, botonExportarCodigos, botonCrearReportes, botonCredenciales
 
-def activarBotones(pBotones, pdicBD=dicBD):
-    print(pdicBD)
-    activar2 = list(pBotones[:2]) + [pBotones[4]]
-    for boton in pBotones:
-        if pdicBD != {} and clientes() != []:
-            boton.config(state="normal")
-            print(False)
-        elif pdicBD != {} and clientes==[]:
-            for boton2 in activar2:
-                boton2.config(state="normal")
-            print(None)
-        else:
-            boton.config(state="disabled")
-            print(True)
-    return ""
-
 def activarBoton(pdatos):
     """
     Función:    Genera estado activo para boton si no existe una BD
@@ -619,10 +632,14 @@ def activarBoton(pdatos):
 
 def configPrincipal(pventana, pbotones):
     funcionActivar = lambda: activarBotones(pbotones[1:-1])
-    funcionCodPostales = lambda: abrirVentanaCargarCodigos(pventana, pbotones[0], funcionActivar)
+    funcionCodPostales = lambda: (abrirVentanaCargarCodigos(pventana, pbotones[0], funcionActivar), cargarCodPostales())
     funcionCredenciales = lambda: abrirVentanaCredenciales(pventana)
+    funcionRegistrarCliente = lambda: abrirVentanaIngresarCliente(pventana, funcionActivar)
+    funcionGenerarClientes = lambda: menuRegistrarClientes(pventana, funcionActivar)
     pbotones[0].config(state=activarBoton(dicBD), command=funcionCodPostales)
     pbotones[-1].config(state="normal", command=funcionCredenciales)
+    pbotones[1].config(command=funcionRegistrarCliente)
+    pbotones[2].config(command=funcionGenerarClientes)
     funcionActivar()
     return ""
 
