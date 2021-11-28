@@ -169,7 +169,7 @@ def deNumAProvincia(pnum,pventana):
     """
     if pnum == -1:
         return mostrarError(pventana,'Por favor elija una provincia')
-    lista = ['San José','Alajuela','Cartago','Heredia','Guanacaste','Puntarenas','limón']
+    lista = ['San José','Alajuela','Cartago','Heredia','Guanacaste','Puntarenas','Limón']
     return lista[pnum]
 
 def deProvinciaACantonAux(pprovincia,pnum,pventana):
@@ -606,5 +606,3 @@ iniciarInterfaz()
 #for elem in clientes():
 #    print(elem.mostrarDatos())
 ##iniciarInterfaz()
-
-print(leerBinarioLista('ClientesBD'))
