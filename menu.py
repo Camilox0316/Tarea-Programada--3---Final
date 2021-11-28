@@ -416,6 +416,14 @@ def abrirVentanaCredenciales(pprincipal):
     labelM = crearLabel(ventana,'Mario Barboza','Franklin Gothic Medium',psize=20).place(x=60,y=420)
     ventana.mainloop()
 #   ------------------------------------------------- VENTANA PRINCIPAL -------------------------------------------------
+def activarBotones(pBotones):
+    for boton in pBotones:
+        if isinstance(dicBD(), dict) and clientes != []:
+            estado = "normal"
+        else:
+            estado = "disabled"
+        boton.config(state=estado)
+    return ""
 def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """
     Funcionalidad: Coloca los botones en la ventana principal 
@@ -441,7 +449,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     
 def iniciarInterfaz():
     """
-    Funcionalidad: Crea la ventana principal que contendrá los botones principales 
+    Funcionalidad: Crea la ventxana principal que contendrá los botones principales 
     Entradas: Na 
     Salidas: Na 
     """
@@ -449,7 +457,7 @@ def iniciarInterfaz():
     dimensionarVentana(ventanaPrincipal, 370, 520)
     colocarBotonesVentanaPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
-iniciarInterfaz()
-for elem in clientes():
-    print(elem.mostrarDatos())
+#iniciarInterfaz()
+#for elem in clientes():
+#    print(elem.mostrarDatos())
 #iniciarInterfaz()
