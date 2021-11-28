@@ -91,7 +91,10 @@ def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
     -pcanton(str): es le canton a sacar distritos
     Salidas: Es el código del distrito
     """
-    return pdict[pprovincia][pcanton][pdistrito]
+    try:
+        return pdict[pprovincia][pcanton][pdistrito]
+    except:
+        return None
 ####################################
 #             Validaciones         #
 ####################################
@@ -102,6 +105,13 @@ def verificarArchivo(nombreArchivo):
     Salidas: Bool
     """
     return leerTXT(nombreArchivo) == ""
+def validarGeneral(plista):
+    con = 1
+    for elem in plista:
+        if elem == -1:
+            return con
+        con +=1
+    return plista
 def esEntero(cantidadGrupos):
     """
     Funcionamiento: Permite ingresar la cantidad de grupos y la cantidad de estudiantes por grupo
@@ -157,7 +167,7 @@ def validarCorreo(pcorreo):
     E:correo(str)
     S: correo gmail (str)
     """
-    if re.match("^[a-zñ]{5,15}(@gmail.com){1}$",pcorreo):
+    if re.match("^[a-zñ\d]{5,15}(@gmail.com){1}$",pcorreo):
         return pcorreo
     return False
     
@@ -400,7 +410,3 @@ def tomarHastaCaracter(ppalabra, pcaracter, ppos='n'):
     if ppos.lower() == "n":
         return ppalabra[:ppalabra.find(str(pcaracter))]
     return ppalabra[:ppalabra.rfind(str(pcaracter))]
-####################################
-#          Insertar Cliente        #
-####################################
-
