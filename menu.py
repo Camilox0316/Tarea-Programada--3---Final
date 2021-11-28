@@ -233,7 +233,8 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
     clienteN.asignarCedula(str(pcedula)),clienteN.asignarNombre(validarNombre(pnombre)),clienteN.asignarDirEspecifica(validarDirEspecifica(pespe))
     clienteN.asignarDirGeneral(listaGen),clienteN.asignarCorreo(pcorreo),clienteN.asignarCodigoPostal(codigo)
     print(clienteN.mostrarDatos())
-
+    listaClientes.append(clienteN)
+    grabarBinario('ClientesBD',listaClientes)
     return mostrarInfo(pventana, "Estudiante Ingresado Satisfactoriamente.")
 
 def entradasRegistrarCliente(pventana):
