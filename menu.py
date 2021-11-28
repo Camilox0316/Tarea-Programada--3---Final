@@ -1,6 +1,7 @@
 ############################
 # Importación de librerias # 
 ############################
+from os import kill
 from generarArchivos import *
 from tkinter import *
 from tkinter.font import BOLD
@@ -8,6 +9,7 @@ from typing import Sized
 from funciones import *
 from archivos import *
 from tkinter import messagebox, ttk
+from claseCliente import *
 
 
 ############################
@@ -158,7 +160,158 @@ def abrirVentanaCargarCodigos(pventana):
     if codigosPostalesDinamico == False:
         return mostrarError(pventana, "Error\nNo se ha encontrado el archivo que contiene los códigos postales.\nEl archivo se debe llamar: BDPostalCR.txt.")
     return mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
+#------------------------------------------ INSERTAR CLIENTE -------------------------------------------------
+def deNumAProvincia(pnum,pventana):
+    """
+    Función:    Busca una provincia a partir del número de la caja de selección
+    Entradas:   pventana ,pprovincia(Str),pcanton(str),pnum(int)
+    Salidas:    Retorna una provincia str
+    """
+    if pnum == -1:
+        return mostrarError(pventana,'Por favor elija una provincia')
+    lista = ['San José','Alajuela','Cartago','Heredia','Guanacaste','Puntarenas','limón']
+    return lista[pnum]
 
+def deProvinciaACantonAux(pprovincia,pnum,pventana):
+    """
+    Función:    Busca un cantón a partir de la provincia y número de caja
+    Entradas:   pventana ,pprovincia(Str),pnum(int)
+    Salidas:    Retorna un cantón str
+    """
+    if pnum == -1:
+        return mostrarError(pventana,'Por favor elija un cantón')
+    pprovincia = deNumAProvincia(pprovincia,pventana)
+    lista=conseguirCantones(dicBD(),pprovincia)
+    return lista[pnum]
+
+def sacarDistrito(pprovincia,pcanton,pnum,pventana):
+    """
+    Función:    Busca un distrito a partir del número de la caja de selección
+    Entradas:   pventana ,pprovincia(Str),pcanton(str),pnum(int)
+    Salidas:    Retorna un distrito str
+    """
+    if pnum == -1:
+        return mostrarError(pventana,'Por favor elija un Distrito')
+    provincia = deNumAProvincia(pprovincia,pventana)
+    pcanton= deProvinciaACantonAux(pprovincia,pcanton,pventana)
+    lista=conseguirDistritos(dicBD(),provincia,pcanton)
+    return lista[pnum]
+#----------------------------------------INSERTAR CLIENTE--------------------------------------------
+def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcodigo,pcorreo):
+    listaClientes = leerBinarioLista('ClientesBD')
+    listaGen = [pprovin,pcan,pdis]
+    if validarCedula(pcedula)== False:
+        return mostrarError(pventana, "La cédula no cumple con el formato.")
+    elif encontrarCedula(pcedula,listaClientes):
+        return mostrarError(pventana, "La cédula ya se encuentra registrada.")
+    elif validarNombre(pnombre)== None:
+        return mostrarError(pventana, "En el nombre debe ingresar 3 valores.")
+    elif validarNombre(pnombre)== False:
+        return mostrarError(pventana, "El nombre debe contener solo letras.")
+    elif validarDirEspecifica(pespe)==False :
+        return mostrarError(pventana, "En la dirrección específica debe ingresar 3 valores.")
+    elif validarDirEspecifica(pespe)== None:
+        return mostrarError(pventana, "deben ser 3 números Calle, Avenida, Número.")
+    elif validarGeneral(listaGen)== 1:
+        return mostrarError(pventana, "Escoja una provincia.")
+    elif validarGeneral(listaGen)== 2:
+        return mostrarError(pventana, "Escoja un cantón.")
+    elif validarGeneral(listaGen)== 3:
+        return mostrarError(pventana, "Escoja un distrito.")
+    elif pcodigo == -1:
+        return mostrarError(pventana, "Escoja el código.")
+    elif validarCorreo(pcorreo) == False:
+        return mostrarError(pventana, "El correo no cumple con el formato.")
+    elif encontrarCorreo(pcorreo,listaClientes):
+        return mostrarError(pventana, "El correo Ya se encuentra registrado.")
+    codigo = conseguirCodigo(dicBD(),deNumAProvincia(listaGen[0],pventana),deProvinciaACantonAux(listaGen[0],listaGen[1],pventana),
+    sacarDistrito(listaGen[0],listaGen[1],listaGen[2],pventana))
+    print(codigo)
+    listaGen = [deNumAProvincia(listaGen[0],pventana),deProvinciaACantonAux(listaGen[0],listaGen[1],pventana),sacarDistrito(listaGen[0],listaGen[1],listaGen[2],pventana)]
+    print(listaGen)
+    clienteN = Cliente()
+    clienteN.asignarCedula(str(pcedula)),clienteN.asignarNombre(validarNombre(pnombre)),clienteN.asignarDirEspecifica(validarDirEspecifica(pespe))
+    clienteN.asignarDirGeneral(listaGen),clienteN.asignarCorreo(pcorreo),clienteN.asignarCodigoPostal(codigo)
+    print(clienteN.mostrarDatos())
+    listaClientes.append(clienteN)
+    grabarBinario('ClientesBD',listaClientes)
+    return mostrarInfo(pventana, "Estudiante Ingresado Satisfactoriamente.")
+
+def entradasRegistrarCliente(pventana):
+    cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
+    funcion = lambda: validarRegistrarClientes(pventana)
+    botonIngresar = crearBoton(pventana, "Crear", funcion)
+
+def cajasGeneral(pventana):
+    """
+    Función:    Crea y actualiza valores de cajas de selección de frases
+    Entradas:   pventana (tk.Toplevel) - Ventana de submenú
+    Salidas:    Retorna objetos (ttk.Combobox) creados
+    """
+    provincias =  conseguirProvincias(dicBD())
+    caja1 = crearCaja(pventana, "Provincias: ", tk.StringVar(), provincias, "center")
+    caja2 = crearCaja(pventana, "Cantones: ", tk.StringVar(), None, "center")
+    caja3 = crearCaja(pventana, "Distrito: ", tk.StringVar(), None, "center")
+    caja4 = crearCaja(pventana, "Código: ", tk.StringVar(), None, "center")
+    funcion1 = lambda: ( caja2.config(state = "normal"), caja2.set("— Cantones Disponibles —"))
+
+    funcion2 = lambda: (caja2.config( values = conseguirCantones(dicBD(),deNumAProvincia( caja1.current(),pventana)))
+    ,caja3.config(state = "normal"),caja3.set("— Distritos Disponibles —"))
+
+    funcion3 = lambda: (caja3.config(values= conseguirDistritos(dicBD(),deNumAProvincia(caja1.current(),pventana)
+    ,deProvinciaACantonAux(caja1.current(),caja2.current(),pventana))),caja4.config(state = "normal"),caja4.set("— Código —"))
+
+    funcion4 = lambda:(caja4.config(values= conseguirCodigo(dicBD(),deNumAProvincia(caja1.current(),pventana),
+    deProvinciaACantonAux(caja1.current(),caja2.current(),pventana),
+    sacarDistrito(caja1.current(),caja2.current(),caja3.current(),pventana))))
+    # Config: Activa caja  al seleccionar caja 1
+    caja1.set("— Provincias —")
+    caja1.config(width = "72", postcommand = funcion1)
+    caja1.pack()
+    # Config: Caja 2 permanece inactiva hasta usar caja 1
+    caja2.config(width = "72", postcommand = funcion2, state = "disabled")
+    caja2.pack()
+
+    caja3.config(width = "72", postcommand = funcion3,state = "disabled")
+    caja3.pack()
+
+    caja4.config(width = "72", postcommand = funcion4,state = "disabled")
+    caja4.pack()
+    return caja1, caja2 , caja3 , caja4
+def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
+    """
+    Funcionalidad: Coloca los componentes(cajas de texto,labels, caja de seleccion) en la ventana
+    de insertar estudiante.
+    Entradas: La ventana en la que se van a unicar los componentes(VentanaInsertarEstudiante)
+    Salidas: Na 
+    """
+    cedula = crearEntradaTexto(ventanaInsertarCliente, "Cédula: ", tk.StringVar(), "center",psize=10)
+    nombre = crearEntradaTexto(ventanaInsertarCliente, "Nombre: ", tk.StringVar(), "center",psize=10)
+    uEspecifica=crearEntradaTexto(ventanaInsertarCliente, "Ubicación Específica: ", tk.StringVar(), "center",psize=10)
+    cajaPro,cajaCan,cajaDis,cajaCod = cajasGeneral(ventanaInsertarCliente)
+    correo=crearEntradaTexto(ventanaInsertarCliente, "Correo Electronico: ", tk.StringVar(), "center",psize=10)
+    correo.config(width=40)
+    correo.pack()
+    funcion = lambda:validarRegistrarCliente(ventanaInsertarCliente,cedula.get(),nombre.get(),uEspecifica.get(),cajaPro.current(),cajaCan.current(),cajaDis.current(),cajaCod.current(),correo.get())
+    botonInsertar=crearBoton(ventanaInsertarCliente,'Ingresar Cliente',funcion)
+    
+def abrirVentanaIngresarCliente(pventana):
+    """
+    Funcionalidad: Al presionar el botón de insertar estudiante se abre esta ventana, la cual contiene cajas de texto
+    menú de selección para ingresar los datos.
+    Entradas: Na 
+    Salidas: Na 
+    """
+    ventanaInsertarCliente = tk.Toplevel(pventana)
+  # Configuracion de la ventana secundaria
+    ventanaInsertarCliente.title("Registrar Cliente")
+    ventanaInsertarCliente.geometry("400x170")
+    ventanaInsertarCliente.resizable(0,0)
+    ventanaInsertarCliente.iconbitmap('icon.ico')
+    ventanaInsertarCliente.lift(pventana)  # Posiciona por encima de ventana principal
+    dimensionarVentana(ventanaInsertarCliente, 350, 700)
+    colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
+    ventanaInsertarCliente.mainloop()
 #   ----------------------------------------- VENTANA CREAR CLIENTES -------------------------------------------------
 def validarRegistrarClientes(pventana, pnum):
     listaClientes, dicCodigos, pnum = clientes(), dicBD(), esEntero(pnum)
@@ -432,7 +585,7 @@ def colocarBotonesVentanaPrincipal(ventanaPrincipal):
     """
     nombresBotones = ("1. códigos postales.", "2. Registrar Cliente.", "3. Crear Clientes.", "4. Generar Etiqueta.",
     "5. Enviar Correo.", "6. Exportar Códigos.", "7. Reportes.", "8. Credenciales.", "9. Salir.")        
-    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: print('Agregar Función registrar clientes'), 
+    funciones = (lambda: abrirVentanaCargarCodigos(ventanaPrincipal), lambda: abrirVentanaIngresarCliente(ventanaPrincipal), 
                 lambda: menuRegistrarClientes(ventanaPrincipal), lambda: abrirVentanaPdfEtiqueta(ventanaPrincipal), 
                 lambda: abrirVentanaEnviarCorreo(ventanaPrincipal), lambda: exportarXML(), 
                 lambda: subMenuReportes(ventanaPrincipal), lambda: abrirVentanaCredenciales(ventanaPrincipal))
@@ -457,7 +610,9 @@ def iniciarInterfaz():
     dimensionarVentana(ventanaPrincipal, 370, 520)
     colocarBotonesVentanaPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
-#iniciarInterfaz()
+iniciarInterfaz()
 #for elem in clientes():
 #    print(elem.mostrarDatos())
-#iniciarInterfaz()
+##iniciarInterfaz()
+
+print(leerBinarioLista('ClientesBD'))
