@@ -176,8 +176,9 @@ def deNumAProvincia(pnum, pcombo):
     """
     if pnum == -1:
         pcombo.config(state="disabled")
-        return ""
+        return -1
     lista = conseguirProvincias(dicBD)
+    print("deNumAProvincia")
     return lista[pnum]
 
 def deProvinciaACantonAux(pprovincia,pnum, pcombo):
@@ -188,9 +189,12 @@ def deProvinciaACantonAux(pprovincia,pnum, pcombo):
     """
     if pnum == -1:
         pcombo.config(state="disabled")
-        return ""
+        print("entró al -1")
+        return -1
     pprovincia = deNumAProvincia(pprovincia, pcombo)
     lista=conseguirCantones(dicBD,pprovincia)
+    pcombo.config(state="readonly")
+    print("deProvinciaACantonAux")
     return lista[pnum]
 
 def sacarDistrito(pprovincia,pcanton,pnum, pcombo):
@@ -201,16 +205,18 @@ def sacarDistrito(pprovincia,pcanton,pnum, pcombo):
     """
     if pnum == -1:
         pcombo.config(state="disabled")
-        return ""
+        return -1
     provincia = deNumAProvincia(pprovincia,pcombo)
     pcanton= deProvinciaACantonAux(pprovincia,pcanton,pcombo)
     lista=conseguirDistritos(dicBD,provincia,pcanton)
+    pcombo.config(state="readonly")
+    print("sacarDistrito")
     return lista[pnum]
 #----------------------------------------INSERTAR CLIENTE--------------------------------------------
-def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcodigo,pcorreo):
+def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcorreo):
     listaClientes = clientes()
     listaGen = [pprovin,pcan,pdis]
-    pespe = validar60(pespe)
+    pespe = validar60(pespe.split())
     pnombre = validarNombre(pnombre)
     if validarCedula(pcedula)== False:
         return mostrarError(pventana, "La cédula no cumple con el formato.")
@@ -224,35 +230,35 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
         return mostrarError(pventana, "En la dirección específica debe ingresar 3 valores.")
     elif pespe == None:
         return mostrarError(pventana, "deben ser 3 números Calle, Avenida, Número.")
-    elif validarGeneral(listaGen)== 1:
+    elif pprovin == "— Provincias —":
         return mostrarError(pventana, "Escoja una provincia.")
-    elif validarGeneral(listaGen)== 2:
+    elif pcan == "— Cantones Disponibles —":
         return mostrarError(pventana, "Escoja un cantón.")
-    elif validarGeneral(listaGen)== 3:
+    elif pdis == "— Distritos Disponibles —":
         return mostrarError(pventana, "Escoja un distrito.")
-    elif pcodigo == -1:
-        return mostrarError(pventana, "Escoja el código.")
     elif validarCorreo(pcorreo) == False:
         return mostrarError(pventana, "El correo no cumple con el formato.")
     elif encontrarCorreo(pcorreo,listaClientes):
-        return mostrarError(pventana, "El correo Ya se encuentra registrado.")
-    codigo = conseguirCodigo(dicBD,deNumAProvincia(listaGen[0],pventana),deProvinciaACantonAux(listaGen[0],listaGen[1],pventana),
-    sacarDistrito(listaGen[0],listaGen[1],listaGen[2],pventana))
-    print(codigo)
-    listaGen = [deNumAProvincia(listaGen[0],pventana),deProvinciaACantonAux(listaGen[0],listaGen[1],pventana),sacarDistrito(listaGen[0],listaGen[1],listaGen[2],pventana)]
-    print(listaGen)
+        pcorreo = generarCorreo(pnombre, False)
+        mostrarInfo(pventana, f"El correo ingresado ya se ha registrado.\nSu nuevo correo será {pcorreo}.")
+    codigo = conseguirCodigo(dicBD, pprovin, pcan, pdis)
     clienteN = Cliente()
-    clienteN.asignarCedula(str(pcedula)),clienteN.asignarNombre(validarNombre(pnombre)),clienteN.asignarDirEspecifica(validarDirEspecifica(pespe))
+    clienteN.asignarCedula(str(pcedula)),clienteN.asignarNombre(pnombre),clienteN.asignarDirEspecifica(pespe)
     clienteN.asignarDirGeneral(listaGen),clienteN.asignarCorreo(pcorreo),clienteN.asignarCodigoPostal(codigo)
     print(clienteN.mostrarDatos())
     listaClientes.append(clienteN)
     grabarBinario('ClientesBD',listaClientes)
-    return mostrarInfo(pventana, "Cliente Ingresado Satisfactoriamente.")
+    return mostrarInfo(pventana, "Cliente ingresado satisfactoriamente.")
 
 def entradasRegistrarCliente(pventana):
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
     funcion = lambda: validarRegistrarClientes(pventana)
     botonIngresar = crearBoton(pventana, "Crear", funcion)
+
+def asignarPls(pentrada, pprov, pcan, pdis):
+    a = StringVar(value=conseguirCodigo(dicBD, pprov.get(), pcan.get(), pdis.get()))
+    pentrada.config(textvariable=a, state="readonly")
+    return pentrada
 
 def cajasGeneral(pventana):
     """
@@ -264,28 +270,24 @@ def cajasGeneral(pventana):
     caja1 = crearCaja(pventana, "Provincias: ", tk.StringVar(), provincias, "center")
     caja2 = crearCaja(pventana, "Cantones: ", tk.StringVar(), None, "center")
     caja3 = crearCaja(pventana, "Distrito: ", tk.StringVar(), None, "center")
-    caja4 = crearCaja(pventana, "Código: ", tk.StringVar(), None, "center")
-    funcion1 = lambda: ( caja2.config(state = "normal"), caja2.set("— Cantones Disponibles —"))
-    #funcion2 = lambda: (caja2.config(values=conseguirCantones(dicBD, provincias[caja1.current()])), caja3.config(state="readonly"), 
-    #caja3.set("- Distritos Disponibles-"))
-    funcion2 = lambda: (caja2.config( values = conseguirCantones(dicBD,deNumAProvincia( caja1.current(),caja2)))
-    ,caja3.config(state = "disabled"),caja3.set("— Distritos Disponibles —"))
+    entrada = tk.Entry(pventana)
+    entrada.config(state="readonly", width=50)
+    #caja4 = crearCaja(pventana, "Código: ", tk.StringVar(), None, "center")
+    funcion1 = lambda: ( caja2.config(state = "readonly"), caja2.set("— Cantones Disponibles —"), print(caja2.get()))
+    funcion2 = lambda: (caja2.config(values = conseguirCantones(dicBD, caja1.get())),
+    caja3.config(state = "readonly"), caja3.set("— Distritos Disponibles —"))
+    funcion3 = lambda: ((caja3.config(values=conseguirDistritos(dicBD, caja1.get(), caja2.get()))), 
+    asignarPls(entrada, caja1, caja2, caja3))
 
-    funcion3 = lambda: (caja3.config(values= conseguirDistritos(dicBD,deNumAProvincia(caja1.current(),caja3)
-    ,deProvinciaACantonAux(caja1.current(),caja2.current(),caja3))),caja4.config(state = "disabled"),caja4.set("— Código —"))
-
-    funcion4 = lambda:(caja4.config(values= conseguirCodigo(dicBD,deNumAProvincia(caja1.current(),caja4),
-    deProvinciaACantonAux(caja1.current(),caja2.current(), caja4),
-    sacarDistrito(caja1.current(),caja2.current(),caja3.current(),caja4))))
-    # Config: Activa caja  al seleccionar caja 1
     caja1.set("— Provincias —")
     caja1.config(width = "72", postcommand = funcion1)
     caja1.pack()
-    funciones = (funcion2, funcion3, funcion4)
-    for i, elemento in enumerate([caja2, caja3, caja4]):
+    funciones = (funcion2, funcion3)
+    for i, elemento in enumerate([caja2, caja3]):
         elemento.config(width = "72", postcommand = funciones[i], state="disabled")
         elemento.pack()
-    return caja1, caja2 , caja3 , caja4
+    entrada.pack()
+    return caja1, caja2 , caja3, entrada
 def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     """
     Funcionalidad: Coloca los componentes(cajas de texto,labels, caja de seleccion) en la ventana
@@ -295,12 +297,13 @@ def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     """
     cedula = crearEntradaTexto(ventanaInsertarCliente, "Cédula: ", tk.StringVar(), "center",psize=10)
     nombre = crearEntradaTexto(ventanaInsertarCliente, "Nombre: ", tk.StringVar(), "center",psize=10)
+    nombre.config(width=40)
     uEspecifica=crearEntradaTexto(ventanaInsertarCliente, "Ubicación Específica: ", tk.StringVar(), "center",psize=10)
-    cajaPro,cajaCan,cajaDis,cajaCod = cajasGeneral(ventanaInsertarCliente)
+    cajaPro,cajaCan,cajaDis, entrada = cajasGeneral(ventanaInsertarCliente)
     correo=crearEntradaTexto(ventanaInsertarCliente, "Correo Electronico: ", tk.StringVar(), "center",psize=10)
     correo.config(width=40)
     correo.pack()
-    funcion = lambda:validarRegistrarCliente(ventanaInsertarCliente,cedula.get(),nombre.get(),uEspecifica.get(),cajaPro.current(),cajaCan.current(),cajaDis.current(),cajaCod.current(),correo.get())
+    funcion = lambda:validarRegistrarCliente(ventanaInsertarCliente,cedula.get(),nombre.get(),uEspecifica.get(),cajaPro.get(),cajaCan.get(),cajaDis.get(),correo.get())
     botonInsertar=crearBoton(ventanaInsertarCliente,'Ingresar Cliente',funcion)
     
 def abrirVentanaIngresarCliente(pventana, pfuncion):
@@ -529,12 +532,11 @@ def validarCedulaCorreo(pventana, pcedula):
         return mostrarError(pventana, "La cédula tiene un formato inválido.")
     elif lista == False:
         return mostrarError(pventana, "Cédula no registrada.")
-    else:
-        try:
-            enviarCorreo(lista[-1],lista[0])
-            return mostrarInfo(pventana,'Se ha enviado Correo')
-        except: 
-            return mostrarError(pventana,'El correo no se pudo enviar')
+
+    enviarCorreo(lista[-1],lista[0])
+    return mostrarInfo(pventana,'Se ha enviado Correo')
+
+        #return mostrarError(pventana,'El correo no se pudo enviar')
 
 def entradaEnviarCorreo(pventana):
     """
@@ -655,4 +657,4 @@ def iniciarInterfaz():
     #colocarBotonesPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
 iniciarInterfaz()
-print(leerBinarioLista('ClientesBD'))
+#print(leerBinarioLista('ClientesBD'))
