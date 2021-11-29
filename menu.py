@@ -390,41 +390,62 @@ def ventanaReporteProvincia(pventana):
     dimensionarVentana(ventana, 350, 200)
     entradasReporteProvincia(ventana)   # Crea y valida entradas
 #---------------------------------------   ETIQUIETA  ---------------------------------------------
-def extenderVentanaEtiqueta(pventana,pcedula):
+def asignarNombre(pcedula):
+    """
+    F: asigna nombre
+    E: cedula
+    S:nombre
+    """
+    tupla = deCedulaATupla(clientes(),pcedula)
+    return mostrarNombreCliente(tupla[0])
+def asignarCodigo(pventana,pentrada,pcedula):
+    """
+    F: asigna codigo a entry
+    E: Pventana entry y cedula str
+    S:entry
+    """
+    try:
+        tupla = deCedulaATupla(clientes(),pcedula)
+        a = StringVar(value=tupla[3])
+        pentrada.config(textvariable=a, state="readonly")
+        return pentrada
+    except:
+        return mostrarError(pventana,'Seleccione una opción')
+
+def asignarGen(pentrada,pcedula):
+    """
+    F: asigna ubicacion general a entry
+    E: entry y cedula str
+    S:entry
+    """
+    tupla = deCedulaATupla(clientes(),pcedula)
+    print(tupla)
+    a = StringVar(value=mostrarDirGeneral(tupla[2]))
+    pentrada.config(textvariable=a, state="readonly")
+    return pentrada
+def asignarEspe(pentrada,pcedula):
+    """
+    F: asigna ubicacion específica a entry
+    E: entry y cedula str
+    S:entry
+    """
+    tupla = deCedulaATupla(clientes(),pcedula)
+    a = StringVar(value=tupla[1])
+    pentrada.config(textvariable=a, state="readonly")
+    return pentrada
+def cajaClientes(pventana):
     """
     F: Crea las cajas de seleccion y extiende la interfaz
     E: ventana y cédula
-    S:N/A
+    S:Caja seleccion
     """
-    clientes = leerBinarioLista('ClientesBD')
-    tupla = deCedulaATupla(clientes,pcedula)
-    if tupla == False:
-        return mostrarError(pventana,'La cédula no se encuentra registrada')
-    nombre = mostrarNombreCliente(tupla[0])
-    lista =  [tupla[1],mostrarDirGeneral(tupla[2]),tupla[3]]
-    entrada = tk.StringVar()
-    entrada.set(lista[0])
-    especificaS = tk.Entry(pventana,textvariable=entrada,state='readonly').pack(padx=10,pady=10)
-
-    entrada1 = tk.StringVar()
-    entrada1.set(lista[1])
-    generalS = tk.Entry(pventana,textvariable=entrada1,state='readonly').pack(padx=10,pady=10)
-
-    entrada2 = tk.StringVar()
-    entrada2.set(lista[2])
-    codigosS = tk.Entry(pventana,textvariable=entrada2,state='readonly').pack(padx=10,pady=10)
-
-    funcion = lambda:(creaPdf(nombre,lista[0],lista[1],lista[2]),mostrarInfo(pventana,f'Etiqueta de: {nombre}, creada ') )
-    boton = crearBoton(pventana,'Generar Etiqueta',funcion)
-def validarCedulaIEtiqueta(pventana, pcedula):
-    """
-    F: Valida la cedula si esta repetida o si la no tiene formato correcto
-    E: ventana y cedula(str)
-    S:N/A
-    """
-    if validarCedula(pcedula)==False:
-        return mostrarError(pventana, "Ingrese un valor en la caja de selección.")
-    return extenderVentanaEtiqueta(pventana,pcedula)
+    listaGen = leerBinarioLista('ClientesBD')
+    listaClientes= listaCedNom(listaGen)
+    cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
+    cajaCli.config(width=60)
+    cajaCli.set("- Clientes -")
+    cajaCli.pack()
+    return cajaCli
 
 def entradasEtiqueta(pventana):
     """
@@ -432,13 +453,30 @@ def entradasEtiqueta(pventana):
     E: ventana
     S: N/A
     """
-    listaGen = leerBinarioLista('ClientesBD')
-    listaClientes= listaCedNom(listaGen)
-    cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
-    cajaCli.config(width=60)
-    cajaCli.set("- Clientes -")
-    funcion = lambda: validarCedulaIEtiqueta(pventana, tomarHastaCaracter(cajaCli.get(),'>'))
-    botonIngresar = crearBoton(pventana, "Ver Info", funcion)
+    cajaCli = cajaClientes(pventana)
+
+    en1 = StringVar()
+    en1.set(None)
+    entrada1 = tk.Entry(pventana,textvariable=None,state='readonly',width=40)
+    entrada1.pack(padx=10,pady=10)
+
+    en2 = StringVar()
+    en2.set(None)
+    entrada2 = tk.Entry(pventana,textvariable=None,state='readonly',width=40)
+    entrada2.pack(padx=10,pady=10)
+
+    en3 = StringVar()
+    en3.set(None)
+    entrada3 = tk.Entry(pventana,textvariable=None,state='readonly',width=40)
+    entrada3.pack(padx=10,pady=10)
+
+    funcion = lambda: (entrada3.config(textvariable=asignarCodigo(pventana,entrada3, tomarHastaCaracter(cajaCli.get(),'>'))),
+    entrada2.config(textvariable=asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(),'>'))),
+    entrada1.config(textvariable=asignarEspe(entrada1, tomarHastaCaracter(cajaCli.get(),'>'))),
+    creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()),
+    mostrarInfo(pventana,f'Etiqueta creada '),
+    print(tomarHastaCaracter(cajaCli.get(),'>'),entrada1.get(),entrada2.get(),entrada3.get()))
+    botonInsertar=crearBoton(pventana,'Ingresar Cliente',funcion)
 ###########################
 # Reporte según cédula    #
 ###########################

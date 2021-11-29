@@ -143,16 +143,21 @@ def validarDirEspecifica(string):
     return f'CA{lista[0]} AV{lista[1]} #{lista[2]}'
 
 def validar60(plista):
-    lista = []
-    for elem in plista:
-        elem = esEntero(elem)
-        if elem==None :
+    try:
+        if len(plista)!= 3:
             return None
-        lista.append(elem)
-    for elemento in lista:
-        if elemento not in range(1,61):
-            return False   
-    return f'CA{lista[0]} AV{lista[1]}  #{lista[2]}.'
+        lista = []
+        for elem in plista:
+            elem = esEntero(elem)
+            if elem==None :
+                return None
+            lista.append(elem)
+        for elemento in lista:
+            if elemento not in range(1,61):
+                return False   
+        return f'CA{lista[0]} AV{lista[1]}  #{lista[2]}.'
+    except:
+        None
 
 def deCedulaATupla(plista,pcedula):
     """
