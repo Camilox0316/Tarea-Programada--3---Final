@@ -10,7 +10,7 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
-from tkinter.constants import E
+from tkinter.constants import E, PIESLICE
 from archivos import *
 from claseCliente import *
 from random import paretovariate, randint
@@ -91,10 +91,13 @@ def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
     -pcanton(str): es le canton a sacar distritos
     Salidas: Es el código del distrito
     """
+    print(f"Provincia: {pprovincia} tipo: {type(pprovincia)}")
+    print(f"can: {pcanton}")
+    print(f"dis: {pdistrito}")
     try:
         return pdict[pprovincia][pcanton][pdistrito]
     except:
-        return None
+        return "Haga click en la caja de selección"
 ####################################
 #             Validaciones         #
 ####################################
@@ -149,7 +152,7 @@ def validar60(plista):
     for elemento in lista:
         if elemento not in range(1,61):
             return False   
-    return f'AV{lista[0]} CA{lista[1]} #{lista[2]}.'
+    return f'CA{lista[0]} AV{lista[1]}  #{lista[2]}.'
 
 def deCedulaATupla(plista,pcedula):
     """
@@ -348,6 +351,26 @@ def agregarCliente(pcedula,pnombre,pespecifica,pgeneral,pcodigo,pcorreo,plista):
     plista.append(clienteActu)
     grabarBinario('ClientesBD',plista)
     return ''
+####################################
+#               Correos            #
+####################################
+def esTildeONN(pletra):
+    return pletra in "áéíóúñ"
+
+def sustituirTildes(ppalabra):
+    dicc = {"á": "a", "é": "e", "í":"i", "ó":"o", "ú": "u", "ñ":"nn"}
+    palabraN = ""
+    for letra in ppalabra:
+        if esTildeONN(letra.lower()):
+            letra = dicc[letra]
+        palabraN += letra
+    return palabraN
+
+def sustituirTildesAux(ptupla):
+    listaN = []
+    for nombre in ptupla:
+        listaN.append(sustituirTildes(nombre))
+    return mostrarNombreCliente(listaN)
 
 def enviarCorreo(correo,nombre):
     """
@@ -355,7 +378,9 @@ def enviarCorreo(correo,nombre):
     Entradas: correo
     Salidas: NA  
     """
-    message = f'Para informarle a {mostrarNombreCliente(nombre)}.\nLa entrega de su paquete es: {str(datetime.date.today() + datetime.timedelta(days=1))}.'
+    correo = "camsanchezr03@gmail.com"
+    message = f'Para informarle a {sustituirTildesAux(nombre)}.\nLa entrega de su paquete será: {str(datetime.date.today() + datetime.timedelta(days=1))}.\n', 
+    'Le pedimos estar pendiente a la nueva entrega.'
     subject = 'Entrega de paquete'
     message = 'Subject: {}\n\n{}'.format(subject, message)
     server = smtplib.SMTP('smtp.gmail.com',587)
