@@ -139,9 +139,12 @@ def validarDirEspecifica(string):
             return None
     return f'CA{lista[0]} AV{lista[1]} #{lista[2]}'
 
-def validar60(plista):
+def validar60(pdirEspe):
+    pdirEspe = pdirEspe.split()
+    if not len(pdirEspe) == 3:
+        return None
     lista = []
-    for elem in plista:
+    for elem in pdirEspe:
         elem = esEntero(elem)
         if elem==None :
             return None
@@ -303,7 +306,7 @@ def encontrarCedula(pcedula, plistaBD):
     Salidas: Bool
     """
     for objeto in plistaBD:
-        if objeto.obtenerCedula == pcedula:
+        if objeto.obtenerCedula() == pcedula:
             return True
     return False
 

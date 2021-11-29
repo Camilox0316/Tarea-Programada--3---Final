@@ -2,7 +2,7 @@
 # Importación de librerias # 
 ############################
 import enum
-from os import kill
+from os import kill, stat_result
 from generarArchivos import *
 from tkinter import *
 from tkinter.font import BOLD
@@ -169,57 +169,46 @@ def abrirVentanaCargarCodigos(pventana, pboton, pfuncion):
     mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
     return ""
 #------------------------------------------ INSERTAR CLIENTE -------------------------------------------------
-def deNumAProvincia(pnum, pcombo):
+def validarEstado(pcombo, pcomboNext, flag=True):
+    if pcombo.get() == "— Provincias —" or pcombo.get()=="— Cantones Disponibles —":
+        pcomboNext.config(state="disabled")
+        return ""
+    pcomboNext.config(state="readonly")
+    return ""
+
+def deNumAProvincia(pprovincia, pcombo, pcomboNext):
     """
     Función:    Busca una provincia a partir del número de la caja de selección
     Entradas:   pventana ,pprovincia(Str),pcanton(str),pnum(int)
     Salidas:    Retorna una provincia str
     """
-    if pnum == -1:
+    if pprovincia == "— Provincias —":
         pcombo.config(state="disabled")
-        return -1
-    lista = conseguirProvincias(dicBD)
-    return lista[pnum]
+        pcomboNext.config(state="disabled")
+        return ""
+    pcomboNext.config(state="readonly")
+    return conseguirCantones(dicBD, pprovincia)
 
-def deProvinciaACantonAux(pprovincia,pnum, pcombo):
+def deProvinciaACantonAux(pprovincia, pcanton, pcombo):
     """
     Función:    Busca un cantón a partir de la provincia y número de caja
     Entradas:   pventana ,pprovincia(Str),pnum(int)
     Salidas:    Retorna un cantón str
     """
-    if pnum == -1:
+    if pcanton == "— Cantones Disponibles —":
         pcombo.config(state="disabled")
-        print("entró al -1")
-        return -1
-    pprovincia = deNumAProvincia(pprovincia, pcombo)
-    lista=conseguirCantones(dicBD,pprovincia)
+        return ""
     pcombo.config(state="readonly")
-    print("deProvinciaACantonAux")
-    return lista[pnum]
+    return conseguirDistritos(dicBD, pprovincia, pcanton)
 
-def sacarDistrito(pprovincia,pcanton,pnum, pcombo):
-    """
-    Función:    Busca un distrito a partir del número de la caja de selección
-    Entradas:   pventana ,pprovincia(Str),pcanton(str),pnum(int)
-    Salidas:    Retorna un distrito str
-    """
-    if pnum == -1:
-        pcombo.config(state="disabled")
-        return -1
-    provincia = deNumAProvincia(pprovincia,pcombo)
-    pcanton= deProvinciaACantonAux(pprovincia,pcanton,pcombo)
-    lista=conseguirDistritos(dicBD,provincia,pcanton)
-    pcombo.config(state="readonly")
-    return lista[pnum]
 #----------------------------------------INSERTAR CLIENTE--------------------------------------------
 def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcorreo):
-    listaClientes = clientes()
     listaGen = [pprovin,pcan,pdis]
-    pespe = validar60(pespe.split())
+    pespe = validar60(pespe)
     pnombre = validarNombre(pnombre)
     if validarCedula(pcedula)== False:
         return mostrarError(pventana, "La cédula no cumple con el formato.")
-    elif encontrarCedula(pcedula,listaClientes):
+    elif encontrarCedula(pcedula,clientes()):
         return mostrarError(pventana, "La cédula ya se encuentra registrada.")
     elif pnombre == None:
         return mostrarError(pventana, "En el nombre debe ingresar 3 valores.")
@@ -228,7 +217,7 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
     elif pespe==False :
         return mostrarError(pventana, "En la dirección específica debe ingresar 3 valores.")
     elif pespe == None:
-        return mostrarError(pventana, "deben ser 3 números Calle, Avenida, Número.")
+        return mostrarError(pventana, "Se debe ingresar 3 valores:\nCalle Avenida #")
     elif pprovin == "— Provincias —":
         return mostrarError(pventana, "Escoja una provincia.")
     elif pcan == "— Cantones Disponibles —":
@@ -237,29 +226,16 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
         return mostrarError(pventana, "Escoja un distrito.")
     elif validarCorreo(pcorreo) == False:
         return mostrarError(pventana, "El correo no cumple con el formato.")
-    elif encontrarCorreo(pcorreo,listaClientes):
+    elif encontrarCorreo(pcorreo,clientes()):
         pcorreo = generarCorreo(pnombre, False)
         mostrarInfo(pventana, f"El correo ingresado ya se ha registrado.\nSu nuevo correo será {pcorreo}.")
     codigo = conseguirCodigo(dicBD, pprovin, pcan, pdis)
     clienteN = Cliente()
     clienteN.asignarCedula(str(pcedula)),clienteN.asignarNombre(pnombre),clienteN.asignarDirEspecifica(pespe)
     clienteN.asignarDirGeneral(listaGen),clienteN.asignarCorreo(pcorreo),clienteN.asignarCodigoPostal(codigo)
-    listaClientes.append(clienteN)
-    grabarBinario('ClientesBD',listaClientes)
+    clientes().append(clienteN)
+    grabarBinario('ClientesBD',clientes())
     return mostrarInfo(pventana, "Cliente ingresado satisfactoriamente.")
-
-def entradasRegistrarCliente(pventana):
-    cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
-    funcion = lambda: validarRegistrarClientes(pventana)
-    botonIngresar = crearBoton(pventana, "Crear", funcion)
-
-
-
-def mostrarCodTK(event):
-    distrito = event.widget.get()
-    varString = tk.StringVar(value=distrito)
-    print(f"Varstring: {varString.get()}")
-    return varString.get()
 
 def asignarPls(pentrada, pprov, pcan, pdis):
     a = StringVar(value=conseguirCodigo(dicBD, pprov.get(), pcan.get(), pdis.get()))
@@ -278,11 +254,13 @@ def cajasGeneral(pventana):
     caja3 = crearCaja(pventana, "Distrito: ", tk.StringVar(), None, "center")
     entrada = tk.Entry(pventana)
     entrada.config(width=50, state="readonly")
-    nom = ("— Provincias —", "— Cantones Disponibles —", "— Distritos Disponibles —")
-    for i, elem in enumerate([caja1, caja2, caja3]):
-        elem.set(nom[i])
-    funcion1 = lambda: (caja2.config(state = "readonly"))
-    funcion2 = lambda: (caja2.config(values = conseguirCantones(dicBD, caja1.get())), caja3.config(state="readonly"))
+    caja1.set("— Provincias —")
+    activar = lambda e: validarEstado(caja1, caja2)
+    funcion1 = lambda: (caja1.bind("<<ComboboxSelected>>", activar), caja2.set("— Cantones Disponibles —"), caja3.config(state="disabled"),
+    caja3.set("— Distritos Disponibles —"), entrada.insert(0, asignarPls(entrada, caja1, caja2, caja3)))
+    activar2 = lambda e: validarEstado(caja2, caja3)
+    funcion2 = lambda: (caja2.config(values = deNumAProvincia(caja1.get(), caja2, caja3)), caja3.set("— Distritos Disponibles —"), 
+    caja2.bind("<<ComboboxSelected>>", activar2), entrada.insert(0, asignarPls(entrada, caja1, caja2, caja3)))
     funcion = lambda e: entrada.insert(0, asignarPls(entrada, caja1, caja2, caja3))
     funcion3 = lambda: (caja3.config(values=conseguirDistritos(dicBD, caja1.get(), caja2.get())), 
     caja3.bind("<<ComboboxSelected>>", funcion))
