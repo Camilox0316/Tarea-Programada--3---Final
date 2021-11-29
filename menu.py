@@ -591,7 +591,7 @@ def colocarBotonesPrincipal(ventanaPrincipal):
     botonSalir = crearBoton(ventanaPrincipal, nombresBotones[-1], ventanaPrincipal.destroy)
     return botonCargarCodigos, botonRegistraCliente, botonInsertarClientes, botonCrearEtiqueta, botonEnviarCorreo, botonExportarCodigos, botonCrearReportes, botonCredenciales
 
-def activarBotones(pBotones, pdicBD=dicBD):
+def activarBotones(pBotones,pdicBD = dicBD):
     print(pdicBD)
     activar2 = list(pBotones[:2]) + [pBotones[4]]
     for boton in pBotones:
