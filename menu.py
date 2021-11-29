@@ -1,6 +1,7 @@
 ############################
 # Importación de librerias # 
 ############################
+import enum
 from os import kill
 from generarArchivos import *
 from tkinter import *
@@ -178,7 +179,6 @@ def deNumAProvincia(pnum, pcombo):
         pcombo.config(state="disabled")
         return -1
     lista = conseguirProvincias(dicBD)
-    print("deNumAProvincia")
     return lista[pnum]
 
 def deProvinciaACantonAux(pprovincia,pnum, pcombo):
@@ -210,7 +210,6 @@ def sacarDistrito(pprovincia,pcanton,pnum, pcombo):
     pcanton= deProvinciaACantonAux(pprovincia,pcanton,pcombo)
     lista=conseguirDistritos(dicBD,provincia,pcanton)
     pcombo.config(state="readonly")
-    print("sacarDistrito")
     return lista[pnum]
 #----------------------------------------INSERTAR CLIENTE--------------------------------------------
 def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcorreo):
@@ -245,7 +244,6 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
     clienteN = Cliente()
     clienteN.asignarCedula(str(pcedula)),clienteN.asignarNombre(pnombre),clienteN.asignarDirEspecifica(pespe)
     clienteN.asignarDirGeneral(listaGen),clienteN.asignarCorreo(pcorreo),clienteN.asignarCodigoPostal(codigo)
-    print(clienteN.mostrarDatos())
     listaClientes.append(clienteN)
     grabarBinario('ClientesBD',listaClientes)
     return mostrarInfo(pventana, "Cliente ingresado satisfactoriamente.")
@@ -254,6 +252,14 @@ def entradasRegistrarCliente(pventana):
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
     funcion = lambda: validarRegistrarClientes(pventana)
     botonIngresar = crearBoton(pventana, "Crear", funcion)
+
+
+
+def mostrarCodTK(event):
+    distrito = event.widget.get()
+    varString = tk.StringVar(value=distrito)
+    print(f"Varstring: {varString.get()}")
+    return varString.get()
 
 def asignarPls(pentrada, pprov, pcan, pdis):
     a = StringVar(value=conseguirCodigo(dicBD, pprov.get(), pcan.get(), pdis.get()))
@@ -271,23 +277,21 @@ def cajasGeneral(pventana):
     caja2 = crearCaja(pventana, "Cantones: ", tk.StringVar(), None, "center")
     caja3 = crearCaja(pventana, "Distrito: ", tk.StringVar(), None, "center")
     entrada = tk.Entry(pventana)
-    entrada.config(state="readonly", width=50)
-    #caja4 = crearCaja(pventana, "Código: ", tk.StringVar(), None, "center")
-    funcion1 = lambda: ( caja2.config(state = "readonly"), caja2.set("— Cantones Disponibles —"), print(caja2.get()))
-    funcion2 = lambda: (caja2.config(values = conseguirCantones(dicBD, caja1.get())),
-    caja3.config(state = "readonly"), caja3.set("— Distritos Disponibles —"))
-    funcion3 = lambda: ((caja3.config(values=conseguirDistritos(dicBD, caja1.get(), caja2.get()))), 
-    asignarPls(entrada, caja1, caja2, caja3))
-
-    caja1.set("— Provincias —")
+    entrada.config(width=50, state="readonly")
+    nom = ("— Provincias —", "— Cantones Disponibles —", "— Distritos Disponibles —")
+    for i, elem in enumerate([caja1, caja2, caja3]):
+        elem.set(nom[i])
+    funcion1 = lambda: (caja2.config(state = "readonly"))
+    funcion2 = lambda: (caja2.config(values = conseguirCantones(dicBD, caja1.get())), caja3.config(state="readonly"))
+    funcion = lambda e: entrada.insert(0, asignarPls(entrada, caja1, caja2, caja3))
+    funcion3 = lambda: (caja3.config(values=conseguirDistritos(dicBD, caja1.get(), caja2.get())), 
+    caja3.bind("<<ComboboxSelected>>", funcion))
     caja1.config(width = "72", postcommand = funcion1)
-    caja1.pack()
-    funciones = (funcion2, funcion3)
-    for i, elemento in enumerate([caja2, caja3]):
-        elemento.config(width = "72", postcommand = funciones[i], state="disabled")
-        elemento.pack()
+    caja2.config(width="72", postcommand=funcion2, state="disabled")
+    caja3.config(width="72", postcommand=funcion3, state="disabled")
     entrada.pack()
     return caja1, caja2 , caja3, entrada
+
 def colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente):
     """
     Funcionalidad: Coloca los componentes(cajas de texto,labels, caja de seleccion) en la ventana
@@ -316,11 +320,10 @@ def abrirVentanaIngresarCliente(pventana, pfuncion):
     ventanaInsertarCliente = tk.Toplevel(pventana)
   # Configuracion de la ventana secundaria
     ventanaInsertarCliente.title("Registrar Cliente")
-    ventanaInsertarCliente.geometry("400x170")
     ventanaInsertarCliente.resizable(0,0)
     ventanaInsertarCliente.iconbitmap('icon.ico')
     ventanaInsertarCliente.lift(pventana)  # Posiciona por encima de ventana principal
-    dimensionarVentana(ventanaInsertarCliente, 350, 700)
+    dimensionarVentana(ventanaInsertarCliente, 350, 600)
     colocarComponentesVentanaInsertarCliente(ventanaInsertarCliente)
     pfuncion()
     ventanaInsertarCliente.mainloop()

@@ -91,13 +91,10 @@ def conseguirCodigo(pdict, pprovincia, pcanton, pdistrito):
     -pcanton(str): es le canton a sacar distritos
     Salidas: Es el código del distrito
     """
-    print(f"Provincia: {pprovincia} tipo: {type(pprovincia)}")
-    print(f"can: {pcanton}")
-    print(f"dis: {pdistrito}")
     try:
         return pdict[pprovincia][pcanton][pdistrito]
     except:
-        return "Haga click en la caja de selección"
+        return ""
 ####################################
 #             Validaciones         #
 ####################################
@@ -418,7 +415,7 @@ def listaCedNom(plista):
 def listaCodDirEspe(plistaObjetos):
     lista = []
     for cliente in plistaObjetos:
-        cliente = f"{cliente.obtenerCodigoPostal()} : {mostrarDirGeneral(cliente.obtenerDirGeneral())}"
+        cliente = f"{cliente.obtenerCodigoPostal()}: {mostrarDirGeneral(cliente.obtenerDirGeneral())}"
         if cliente not in lista:
             lista.append(cliente)
     return lista
