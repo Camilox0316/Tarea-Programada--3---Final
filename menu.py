@@ -296,7 +296,6 @@ def abrirVentanaIngresarCliente(pventana, pfuncion):
     Salidas: Na 
     """
     ventanaInsertarCliente = tk.Toplevel(pventana)
-  # Configuracion de la ventana secundaria
     ventanaInsertarCliente.title("Registrar Cliente")
     ventanaInsertarCliente.lift(pventana)  # Posiciona por encima de ventana principal
     dimensionarVentana(ventanaInsertarCliente, 350, 600)
@@ -326,7 +325,6 @@ def menuRegistrarClientes(pprincipal, pfuncion):
     Salidas: Na 
     """
     ventana = tk.Toplevel(pprincipal)
-    # Configuracion de la ventana secundaria
     ventana.title("Crear clientes")
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 100)
@@ -357,7 +355,6 @@ def entradasReporteProvincia(pventana):
     
 def ventanaReporteProvincia(pventana):
     ventana = tk.Toplevel(pventana)
-    # Configuracion de la ventana secundaria
     ventana.title("Reporte según provincia")
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
     dimensionarVentana(ventana, 350, 200)
@@ -619,7 +616,5 @@ def iniciarInterfaz():
     ventanaPrincipal = crearVentana("Correos Costa Rica")
     dimensionarVentana(ventanaPrincipal, 370, 520)
     configPrincipal(ventanaPrincipal, colocarBotonesPrincipal(ventanaPrincipal))
-    #colocarBotonesPrincipal(ventanaPrincipal)
     ventanaPrincipal.mainloop()
 iniciarInterfaz()
-#print(leerBinarioLista('ClientesBD'))
