@@ -33,7 +33,12 @@ def crearBoton(pventana, ptexto, pfuncion):
         pgrid, pspan (tuple, opcional)  - Indican como acomodar botones
     Salidas:    Retorna el botón creado
     """
-    boton = ttk.Button(pventana, text= ptexto, command= pfuncion)
+    style = ttk.Style()
+    style.map("C.TButton",
+    foreground=[('pressed', 'green'), ('active', 'black')],
+    background=[('pressed', '!disabled', 'green'), ('active', 'green')])
+    style.configure(style="C.TButton", background="#d9d9d9")
+    boton = ttk.Button(pventana, text= ptexto, command= pfuncion ,style="C.TButton")
     boton.config(width = "25")
     boton.pack(padx=30, pady=10)    # Acomoda botón creado
     return boton
@@ -96,7 +101,7 @@ def crearVentana(titulo):
     ventana = Tk()
     ventana.title(titulo)
     ventana.resizable(False,False)
-    ventana.config(bg = '#f0f0f0')
+    ventana.config(bg = '#d9d9d9')
     ventana.iconbitmap('icon.ico')
     ventana.update()
     return ventana
@@ -252,8 +257,9 @@ def cajasGeneral(pventana):
     caja1 = crearCaja(pventana, "Provincias: ", tk.StringVar(), provincias, "center")
     caja2 = crearCaja(pventana, "Cantones: ", tk.StringVar(), None, "center")
     caja3 = crearCaja(pventana, "Distrito: ", tk.StringVar(), None, "center")
+    miLabel = crearLabel(pventana, "Código postal", psize=10).pack(padx=10, pady=10)
     entrada = tk.Entry(pventana)
-    entrada.config(width=50, state="readonly")
+    entrada.config(width=10, state="readonly")
     caja1.set("— Provincias —")
     activar = lambda e: validarEstado(caja1, caja2)
     funcion1 = lambda: (caja1.bind("<<ComboboxSelected>>", activar), caja2.set("— Cantones Disponibles —"), caja3.config(state="disabled"),
@@ -387,6 +393,7 @@ def generarEtiquetaTK(pventana, pcedula, pdirGen, pdirEspe, pcodigo):
     try:
         nombre = mostrarNombreCliente(deCedulaATupla(clientes(), pcedula)[0])
         creaPdf(nombre, pdirEspe, pdirGen, pcodigo)
+        pventana.destroy()
         return ""
     except:
         return mostrarError(pventana, "Por favor seleccione algún cliente.")
@@ -615,6 +622,33 @@ def iniciarInterfaz():
     """
     ventanaPrincipal = crearVentana("Correos Costa Rica")
     dimensionarVentana(ventanaPrincipal, 370, 520)
+    frase = PhotoImage(file="fraseCR.png")
+    miLabel = Label(ventanaPrincipal, image=frase, background="#d9d9d9").pack()
     configPrincipal(ventanaPrincipal, colocarBotonesPrincipal(ventanaPrincipal))
     ventanaPrincipal.mainloop()
 iniciarInterfaz()
+#import tkinter
+#from tkinter import ttk
+#
+#root = tkinter.Tk()
+#style = ttk.Style()
+#style.map("C.TButton",
+#    foreground=[('pressed', 'green'), ('active', 'black')],
+#    background=[('pressed', '!disabled', 'green'), ('active', 'green')])
+#colored_btn = ttk.Button(text="Test", style="C.TButton")
+#colored_btn.pack()
+#colored_btn.config(width=55)
+#
+#root.mainloop()
+#from tkinter import ttk
+#import tkinter
+#
+#root = tkinter.Tk()
+#
+#ttk.Style().configure("TButton", padding=6, relief="flat",
+#   background="blue")
+#
+#btn = ttk.Button(text="Sample")
+#btn.pack()
+#
+#root.mainloop()
