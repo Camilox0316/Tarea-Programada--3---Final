@@ -10,12 +10,8 @@ Versión:              Python 3.9.6
 #####              Importación de Librerías              #####
 ##############################################################
 
-from tkinter.constants import E, PIESLICE
 from archivos import *
 from claseCliente import *
-from random import paretovariate, randint
-import re, names, datetime, smtplib
-from tkinter import StringVar
 from random import randint
 import re, names, datetime, smtplib
 
@@ -152,7 +148,7 @@ def validar60(pdirEspe):
     for elemento in lista:
         if elemento not in range(1,61):
             return False   
-    return f'CA{lista[0]} AV{lista[1]}  #{lista[2]}.'
+    return f'CA{lista[0]} AV{lista[1]} #{lista[2]}'
 
 def deCedulaATupla(plista,pcedula):
     """
@@ -164,6 +160,7 @@ def deCedulaATupla(plista,pcedula):
         if cliente.obtenerCedula()==pcedula:
             return cliente.obtenerDatos()
     return False
+    
 def validarCorreo(pcorreo):
     """
     F: Cambia correo a un correo gmail
@@ -378,9 +375,9 @@ def enviarCorreo(correo,nombre):
     Entradas: correo
     Salidas: NA  
     """
-    correo = "camsanchezr03@gmail.com"
-    message = f'Para informarle a {sustituirTildesAux(nombre)}.\nLa entrega de su paquete será: {str(datetime.date.today() + datetime.timedelta(days=1))}.\n', 
-    'Le pedimos estar pendiente a la nueva entrega.'
+    print(nombre)
+    correo = ["camsanchezr03@gmail.com", "marionetabar1@gmail.com"]
+    message = f'Para informarle a {sustituirTildesAux(nombre)}.\nLa entrega de su paquete es para la fecha: {str(datetime.date.today() + datetime.timedelta(days=1))}.\nLe pedimos estar pendiente.\n\nEste correo se crea automaticamente, por favor no responder'
     subject = 'Entrega de paquete'
     message = 'Subject: {}\n\n{}'.format(subject, message)
     server = smtplib.SMTP('smtp.gmail.com',587)
@@ -388,25 +385,7 @@ def enviarCorreo(correo,nombre):
     server.login('correoscrmariocamilo@gmail.com','tareaProgramada')
     server.sendmail('correoscrmariocamilo@gmail.com',correo,message)
     server.quit()
-    return "Se envió con éxito."
-
-def crearCaja(pventana, ptexto, pvariable, pvalores, pgrid, pjustify):
-    """
-    Función:    Crea caja de selección para entradas
-    Entradas:
-        pventana (tk.Toplevel)          - Ventana gráfica
-        ptexto, pjustify (str)          - Texto de selección y como justificarlo
-        pvariable (tk.StrVar/tk.IntVar) - Variable donde se almacena entrada
-        pvalores, pgrid (tuple)         - Valores disponibles y como acomodar widgets
-    Salidas:    Retorna el objeto (caja de selección) creado
-    """
-    # Objetos: etiqueta, caja de selección
-    texto = tk.Label(pventana, text= ptexto)
-    select = ttk.Combobox(pventana, textvariable=pvariable, values=pvalores, justify=pjustify, state="readonly")
-    # Posicionamiento grid
-    texto.grid(row= pgrid[0], column= pgrid[1], sticky= pgrid[2])
-    select.grid(row = pgrid[0], column = pgrid[1] + 1)
-    return select
+    return ""
 
 def listaCedNom(plista):
     lista = []

@@ -71,14 +71,16 @@ def creaPdf(nombre,especifica,general,codigo):
     pdf.set_font('serif','B',12)
     pdf.cell(220,10,nombre,ln=True,align='l',border='T,R,L')
     pdf.set_font('serif2','',12)
-    pdf.cell(220,10,especifica,align='l',fill=0,border='R,L',ln=1)
-    pdf.cell(220,10,general,align='l',fill=0,border='R,L',ln=2)
-    pdf.cell(220,10,codigo,align='l',fill=0,border='R,L',ln=3)
+    pdf.cell(220,10,f"Dirección específica: {especifica}",align='l',fill=0,border='R,L',ln=1)
+    pdf.cell(220,10,f"Dirección general: {general}",align='l',fill=0,border='R,L',ln=2)
+    pdf.cell(220,10,f"Código postal: {codigo}",align='l',fill=0,border='R,L',ln=3)
     pdf.cell(220,10,'COSTA RICA',align='l',fill=0,border='R,L,B',ln=4)
     pdf.image('stamp.png',180,68,50,50)
     for elem in (200,100,0):
         pdf.image('correo.png',elem,150,80)
-    pdf.output((f'{(nombre.split())[0]}.pdf'))
+    nombre = f"{nombre.split()[0]}.pdf"
+    pdf.output(nombre)
+    os.startfile(nombre)
     return 'Archivo Creado'
 #creaPdf('Mario Barboza Artavia','Alajuela, San Ramon, San Ramón ','AV: 2 C: 2 #55 ' ,'1101010')
 ######################################### HTML ########################################################
@@ -90,7 +92,7 @@ def mostrarDirEspecifica(pstring):
     Salidas: Str(); es la direccion especifica, para mostrar en el HTML
     """
     pstring = pstring.split()
-    return f"<b>CA</b>{pstring[0][2:]}<b> AV</b>{pstring[1][2:]} <b>#</b>{pstring[2][1:]}"
+    return f"<b>CA</b>{pstring[0][2:]}<b> AV</b>{pstring[1][2:]}<b> #</b>{pstring[2][1:]}"
 
 def crearNombreArch(pstring):
     """
