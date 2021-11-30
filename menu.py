@@ -429,10 +429,11 @@ def entradasEtiqueta(pventana):
     for elem in (entrada1, entrada2, entrada3):
         elem.config(textvariable=None, state="readonly", width=40)
         elem.pack(padx=10, pady=10)
-    funcion0 = lambda e: (entrada1.insert(0, asignarEspe(entrada1, tomarHastaCaracter(cajaCli.get(), ">"))),
-    entrada2.insert(0, asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(), ">"))),
-    entrada3.insert(0, asignarCodigo(pventana, entrada3, tomarHastaCaracter(cajaCli.get(), ">"))))
-    funcion = lambda: cajaCli.bind("ComboboxSelected", funcion0)
+    funcion0 = lambda e: entrada1.insert(0, asignarEspe(entrada1, tomarHastaCaracter(cajaCli.get(), ">")))
+    funcion1 = lambda e: entrada2.insert(0, asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(), ">")))
+    funcion2 = lambda e: entrada3.insert(0, asignarCodigo(pventana, entrada3, tomarHastaCaracter(cajaCli.get(), ">")))
+    funcion3 = lambda e: (funcion0(e), funcion1(e), funcion2(e))
+    funcion = lambda: cajaCli.bind("ComboboxSelected", funcion3)
     cajaCli.config(postcommand=funcion)
     #funcion = lambda: (entrada3.config(textvariable=asignarCodigo(pventana,entrada3, tomarHastaCaracter(cajaCli.get(),'>'))),
     #entrada2.config(textvariable=asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(),'>'))),
@@ -440,8 +441,8 @@ def entradasEtiqueta(pventana):
     #creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()),
     #mostrarInfo(pventana,f'Etiqueta creada '),
     #print(tomarHastaCaracter(cajaCli.get(),'>'),entrada1.get(),entrada2.get(),entrada3.get()))
-    funcion2 = lambda: (creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()), mostrarInfo(pventana,f'Etiqueta creada '))
-    botonInsertar=crearBoton(pventana,'Generar etiqueta',funcion2)
+    funcion4 = lambda: (creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()), mostrarInfo(pventana,f'Etiqueta creada '))
+    botonInsertar=crearBoton(pventana,'Generar etiqueta',funcion4)
 ###########################
 # Reporte según cédula    #
 ###########################
