@@ -414,19 +414,6 @@ def asignarEspe(pentrada,pcedula):
     a = StringVar(value=tupla[1])
     pentrada.config(textvariable=a, state="readonly")
     return pentrada
-def cajaClientes(pventana):
-    """
-    F: Crea las cajas de seleccion y extiende la interfaz
-    E: ventana y cédula
-    S:Caja seleccion
-    """
-    listaGen = leerBinarioLista('ClientesBD')
-    listaClientes= listaCedNom(listaGen)
-    cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
-    cajaCli.config(width=60)
-    cajaCli.set("- Clientes -")
-    cajaCli.pack()
-    return cajaCli
 
 def entradasEtiqueta(pventana):
     """
@@ -434,30 +421,27 @@ def entradasEtiqueta(pventana):
     E: ventana
     S: N/A
     """
-    cajaCli = cajaClientes(pventana)
-
-    en1 = StringVar()
-    en1.set(None)
-    entrada1 = tk.Entry(pventana,textvariable=None,state='readonly',width=40)
-    entrada1.pack(padx=10,pady=10)
-
-    en2 = StringVar()
-    en2.set(None)
-    entrada2 = tk.Entry(pventana,textvariable=None,state='readonly',width=40)
-    entrada2.pack(padx=10,pady=10)
-
-    en3 = StringVar()
-    en3.set(None)
-    entrada3 = tk.Entry(pventana,textvariable=None,state='readonly',width=40)
-    entrada3.pack(padx=10,pady=10)
-
-    funcion = lambda: (entrada3.config(textvariable=asignarCodigo(pventana,entrada3, tomarHastaCaracter(cajaCli.get(),'>'))),
-    entrada2.config(textvariable=asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(),'>'))),
-    entrada1.config(textvariable=asignarEspe(entrada1, tomarHastaCaracter(cajaCli.get(),'>'))),
-    creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()),
-    mostrarInfo(pventana,f'Etiqueta creada '),
-    print(tomarHastaCaracter(cajaCli.get(),'>'),entrada1.get(),entrada2.get(),entrada3.get()))
-    botonInsertar=crearBoton(pventana,'Ingresar Cliente',funcion)
+    listaClientes= listaCedNom(clientes())
+    cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
+    cajaCli.config(width=75)
+    cajaCli.set("- Clientes -")
+    entrada1, entrada2, entrada3 = tk.Entry(pventana), tk.Entry(pventana), tk.Entry(pventana)
+    for elem in (entrada1, entrada2, entrada3):
+        elem.config(textvariable=None, state="readonly", width=40)
+        elem.pack(padx=10, pady=10)
+    funcion0 = lambda e: (entrada1.insert(0, asignarEspe(entrada1, tomarHastaCaracter(cajaCli.get(), ">"))),
+    entrada2.insert(0, asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(), ">"))),
+    entrada3.insert(0, asignarCodigo(pventana, entrada3, tomarHastaCaracter(cajaCli.get(), ">"))))
+    funcion = lambda: cajaCli.bind("ComboboxSelected", funcion0)
+    cajaCli.config(postcommand=funcion)
+    #funcion = lambda: (entrada3.config(textvariable=asignarCodigo(pventana,entrada3, tomarHastaCaracter(cajaCli.get(),'>'))),
+    #entrada2.config(textvariable=asignarGen(entrada2, tomarHastaCaracter(cajaCli.get(),'>'))),
+    #entrada1.config(textvariable=asignarEspe(entrada1, tomarHastaCaracter(cajaCli.get(),'>'))),
+    #creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()),
+    #mostrarInfo(pventana,f'Etiqueta creada '),
+    #print(tomarHastaCaracter(cajaCli.get(),'>'),entrada1.get(),entrada2.get(),entrada3.get()))
+    funcion2 = lambda: (creaPdf(asignarNombre(tomarHastaCaracter(cajaCli.get(),'>')),entrada1.get(),entrada2.get(),entrada3.get()), mostrarInfo(pventana,f'Etiqueta creada '))
+    botonInsertar=crearBoton(pventana,'Generar etiqueta',funcion2)
 ###########################
 # Reporte según cédula    #
 ###########################
