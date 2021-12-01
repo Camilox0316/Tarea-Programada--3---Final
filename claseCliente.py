@@ -158,19 +158,3 @@ class Cliente():
         f"correo: {self.obtenerCorreo()}\n"
         f"Demostración que es un objeto: {type(self)}")
         return ""
-    
-"""
-clienteActual = Cliente()
-clienteActual.asignarCedula("1-0000-0000")
-clienteActual.asignarNombre(("camilo", "sánchez", "rodríguez"))
-clienteActual.asignarDirEspecifica("Ca ## Av ## # ##")
-clienteActual.asignarDirGeneral(["san jose", "san jose", "paso ancho"])
-clienteActual.asignarCodigoPostal(10110)
-clienteActual.asignarCorreo("camsanchez@gmail.com")
-print(f"Cédula: {clienteActual.obtenerCedula()}")
-print(f"Nombre: {clienteActual.obtenerNombre()}")
-print(f"Dir espe: {clienteActual.obtenerDirEspecifica()}")
-print(f"Dir gen: {clienteActual.obtenerDirGeneral()}")
-print(f"code postal: {clienteActual.obtenerCodigoPostal()}")
-print(f"Correo: {clienteActual.obtenerCorreo()}")
-"""    

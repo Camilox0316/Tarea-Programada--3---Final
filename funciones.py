@@ -136,6 +136,11 @@ def validarDirEspecifica(string):
     return f'CA{lista[0]} AV{lista[1]} #{lista[2]}'
 
 def validar60(pdirEspe):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     pdirEspe = pdirEspe.split()
     if not len(pdirEspe) == 3:
         return None
@@ -270,6 +275,39 @@ def generarCodPostal_DirGeneral(pdictBD, pcedula):
     distritoRandom = distritos[randint(0, len(distritos)-1)]
     return (conseguirCodigo(pdictBD, provinciaIndicada, cantonRandom, distritoRandom), [provinciaIndicada, cantonRandom, distritoRandom])
 
+def esTildeONN(pletra):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
+    return pletra in "áéíóúñ"
+
+def sustituirTildes(ppalabra):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
+    dicc = {"á": "a", "é": "e", "í":"i", "ó":"o", "ú": "u", "ñ":"nn"}
+    palabraN = ""
+    for letra in ppalabra:
+        if esTildeONN(letra.lower()):
+            letra = dicc[letra]
+        palabraN += letra
+    return palabraN
+
+def sustituirTildesAux(ptupla):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
+    listaN = []
+    for nombre in ptupla:
+        listaN.append(sustituirTildes(nombre))
+    return mostrarNombreCliente(listaN)
+
 def generarCorreo(ptupla, pflag=True):
     """
     Función: Genera el correo de un cliente 
@@ -308,6 +346,11 @@ def encontrarCedula(pcedula, plistaBD):
     return False
 
 def crearListCodDisponibles(plistaObjetos):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     lista = []
     for cliente in plistaObjetos:
         codigo = cliente.obtenerCodigoPostal()
@@ -316,6 +359,11 @@ def crearListCodDisponibles(plistaObjetos):
     return lista
 
 def crearListProvDisp(plistaObjetos):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     lista = []
     for cliente in plistaObjetos:
         prov = cliente.obtenerDirGeneral()[0]
@@ -327,6 +375,11 @@ def crearListProvDisp(plistaObjetos):
 #          Generar clientes        #
 ####################################
 def crearClientes(pcantidad, plistaBD, pdiccCodigos):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     while pcantidad != 0:
         cedula = crearCedula()
         if not encontrarCedula(cedula, plistaBD):
@@ -341,41 +394,15 @@ def crearClientes(pcantidad, plistaBD, pdiccCodigos):
             plistaBD.append(clienteActu)
             pcantidad -= 1
     return plistaBD
-def agregarCliente(pcedula,pnombre,pespecifica,pgeneral,pcodigo,pcorreo,plista):
-    clienteActu = Cliente()
-    clienteActu.asignarCedula(pcedula), clienteActu.asignarNombre(pnombre), clienteActu.asignarDirEspecifica(pespecifica),
-    clienteActu.asignarDirGeneral(pgeneral), clienteActu.asignarCodigoPostal(pcodigo), clienteActu.asignarCorreo(pcorreo)
-    plista.append(clienteActu)
-    grabarBinario('ClientesBD',plista)
-    return ''
 ####################################
 #               Correos            #
 ####################################
-def esTildeONN(pletra):
-    return pletra in "áéíóúñ"
-
-def sustituirTildes(ppalabra):
-    dicc = {"á": "a", "é": "e", "í":"i", "ó":"o", "ú": "u", "ñ":"nn"}
-    palabraN = ""
-    for letra in ppalabra:
-        if esTildeONN(letra.lower()):
-            letra = dicc[letra]
-        palabraN += letra
-    return palabraN
-
-def sustituirTildesAux(ptupla):
-    listaN = []
-    for nombre in ptupla:
-        listaN.append(sustituirTildes(nombre))
-    return mostrarNombreCliente(listaN)
-
 def enviarCorreo(correo,nombre):
     """
     Funcionalidad: Envia correo  
     Entradas: correo
     Salidas: NA  
     """
-    print(nombre)
     correo = ["camsanchezr03@gmail.com", "marionetabar1@gmail.com"]
     message = f'Para informarle a {sustituirTildesAux(nombre)}.\nLa entrega de su paquete es para la fecha: {str(datetime.date.today() + datetime.timedelta(days=1))}.\nLe pedimos estar pendiente.\n\nEste correo se crea automaticamente, por favor no responder'
     subject = 'Entrega de paquete'
@@ -388,6 +415,11 @@ def enviarCorreo(correo,nombre):
     return ""
 
 def listaCedNom(plista):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     lista = []
     for cliente in plista:
         cliente = cliente.obtenerCedNom()
@@ -395,6 +427,11 @@ def listaCedNom(plista):
     return lista
 
 def listaCodDirEspe(plistaObjetos):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     lista = []
     for cliente in plistaObjetos:
         cliente = f"{cliente.obtenerCodigoPostal()}: {mostrarDirGeneral(cliente.obtenerDirGeneral())}"

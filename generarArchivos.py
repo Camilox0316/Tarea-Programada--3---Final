@@ -186,11 +186,3 @@ def crearReporteCodPostal(pcodigo, plistaObjetos):
             <td> {mostrarDirGeneral(cliente.obtenerDirGeneral())} </td> <td> {codPostal} </td>"""
     guardarArchHTML(crearNombreArch(pcodigo), tabla+"</tr></table></body></html>")
     return ""
-"""
-bd = crearBDCodigos()
-crearXML(bd)
-x = crearClientes(400, [], bd)
-for cliente in x:
-    cliente.mostrarDatos()
-crearReporteProvincia("San José", x)
-"""

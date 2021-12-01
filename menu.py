@@ -9,7 +9,6 @@ from archivos import *
 from tkinter import messagebox, ttk
 from claseCliente import *
 
-
 ############################
 #    Variables globales    # 
 ############################
@@ -155,6 +154,11 @@ def confirmarTk(pventana, pmensaje):
 
 ########################################### Cargar códigos ##################################################    
 def cargarCodPostales():
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     dicBD.update(crearBDCodigos())
     return dicBD
 
@@ -172,7 +176,12 @@ def abrirVentanaCargarCodigos(pventana, pboton, pfuncion):
     mostrarInfo(pventana, "Se han cargado los códigos exitosamente.")
     return ""
 ########################################### Insertar cliente ##################################################    
-def validarEstado(pcombo, pcomboNext, flag=True):
+def validarEstado(pcombo, pcomboNext):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     if pcombo.get() == "— Provincias —" or pcombo.get()=="— Cantones Disponibles —":
         pcomboNext.config(state="disabled")
         return ""
@@ -206,6 +215,11 @@ def deProvinciaACantonAux(pprovincia, pcanton, pcombo):
 
 ########################################### Insertar cliente ##################################################    
 def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcorreo, pfuncion):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listaGen = [pprovin,pcan,pdis]
     pespe = validar60(pespe)
     pnombre = validarNombre(pnombre)
@@ -214,7 +228,7 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
     elif encontrarCedula(pcedula,clientes()):
         return mostrarError(pventana, "La cédula ingresada ya se encuentra ingresada.")
     elif pnombre == None:
-        return mostrarError(pventana, "En el nombre debe ingresar 3 valores.")
+        return mostrarError(pventana, "En el nombre se debe ingresar: Nombre1 Apellido1 Apellido2")
     elif pnombre == False:
         return mostrarError(pventana, "El nombre debe contener solo letras.")
     elif pespe == None:
@@ -239,10 +253,17 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
     listaClientes = clientes()
     listaClientes.append(clienteN)
     grabarBinario('ClientesBD',listaClientes)
+    mostrarInfo(pventana, "Cliente ingresado satisfactoriamente.")
+    pventana.destroy()
     pfuncion()
-    return mostrarInfo(pventana, "Cliente ingresado satisfactoriamente.")
+    return ""
 
 def asignarPls(pentrada, pprov, pcan, pdis):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     a = StringVar(value=conseguirCodigo(dicBD, pprov.get(), pcan.get(), pdis.get()))
     pentrada.config(textvariable=a, state="readonly")
     return pentrada
@@ -309,6 +330,11 @@ def abrirVentanaIngresarCliente(pventana, pfuncion):
     ventanaInsertarCliente.mainloop()
 ########################################### Ventana crear clientes ##################################################    
 def validarRegistrarClientes(pventana, pnum, pfuncion):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listaClientes, dicCodigos, pnum = clientes(), dicBD, esEntero(pnum)
     if pnum == None:
         return mostrarError(pventana, "Solo se deben ingresar números enteros.")
@@ -319,6 +345,11 @@ def validarRegistrarClientes(pventana, pnum, pfuncion):
     return mostrarInfo(pventana, "Base de datos creada.")
 
 def entradasRegistrarClientes(pventana, pfuncion):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
     funcion = lambda: validarRegistrarClientes(pventana, cantidadClientes.get(), pfuncion)
     botonIngresar = crearBoton(pventana, "Crear", funcion)
@@ -338,28 +369,52 @@ def menuRegistrarClientes(pprincipal, pfuncion):
     
 ###########################################   exportar   ##################################################
 def exportarXML():
-    dicCodigos = dicBD
-    crearXML(dicCodigos)
-    return ""
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
+    try:
+        dicCodigos = dicBD
+        crearXML(dicCodigos)
+        return ""
+    except:
+        return mostrarError(None, "Por favor, primero cierre el archivo 'codigoPostal.xml'.")
 ########################################### Reportes     ##################################################   
 ###########################
 # Reporte según provincia #
 ###########################
 def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listaClientes = clientes()
     if pprovincia == -1:
         return mostrarError(pventana, "Por favor escoja una provincia")
     return crearReporteProvincia(pprovinciasTotales[pprovincia], listaClientes)
 
 def entradasReporteProvincia(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listClientes = clientes()
     provincias = crearListProvDisp(listClientes)
+    provincias.sort()
     cajaProv = crearCaja(pventana, "Escoja una provincia", tk.StringVar(), provincias, "center")
     cajaProv.set("- Provincias -")
     funcion = lambda: validarReporteProvincia(pventana, cajaProv.current(), provincias)
     boton = crearBoton(pventana, "Crear reporte", funcion)
     
 def ventanaReporteProvincia(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según provincia")
     ventana.lift(pventana)    # Posiciona por encima de ventana principal
@@ -377,7 +432,13 @@ def asignarNombre(pcedula):
         return mostrarNombreCliente(tupla[0])
     except:
         return mostrarError(None, "Por favor seleccione a un cliente")
+
 def rellenarEntradasEtiqueta(pventana, pentradaGen, pentradaEspe, pentradaCod, pcedula):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     try:
         tupla = deCedulaATupla(clientes(),pcedula)
         a = StringVar(value=tupla[3])
@@ -389,7 +450,13 @@ def rellenarEntradasEtiqueta(pventana, pentradaGen, pentradaEspe, pentradaCod, p
         return pentradaGen, pentradaEspe, pentradaCod
     except:
         return mostrarError(pventana,'Seleccione una cédula')
+        
 def generarEtiquetaTK(pventana, pcedula, pdirGen, pdirEspe, pcodigo):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     try:
         nombre = mostrarNombreCliente(deCedulaATupla(clientes(), pcedula)[0])
         creaPdf(nombre, pdirEspe, pdirGen, pcodigo)
@@ -397,6 +464,7 @@ def generarEtiquetaTK(pventana, pcedula, pdirGen, pdirEspe, pcodigo):
         return ""
     except:
         return mostrarError(pventana, "Por favor seleccione algún cliente.")
+
 def entradasEtiqueta(pventana):
     """
     F: ingresa a la ventana los botones y cajas de seleccion 
@@ -404,6 +472,7 @@ def entradasEtiqueta(pventana):
     S: N/A
     """
     listaClientes= listaCedNom(clientes())
+    listaClientes.sort()
     cajaCli = crearCaja(pventana, "Escoja un cliente", tk.StringVar(), listaClientes, "center")
     cajaCli.config(width=75)
     cajaCli.set("- Clientes -")
@@ -422,6 +491,11 @@ def entradasEtiqueta(pventana):
 # Reporte según cédula    #
 ###########################
 def validarReporteCedula(pventana, pcedula):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listaClientes = clientes()
     pcedula = validarCedula(pcedula)
     if pcedula == False:
@@ -431,11 +505,21 @@ def validarReporteCedula(pventana, pcedula):
     return crearReporteCliente(pcedula, listaClientes)
 
 def entradasReporteCedula(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     cedula = crearEntradaTexto(pventana, "Ingrese la cédula", tk.StringVar(), "center")
     funcion = lambda: validarReporteCedula(pventana, cedula.get())
     boton = crearBoton(pventana, "Generar reporte", funcion)
 
 def ventaReporteCedula(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según cédula")
     ventana.lift(pventana)
@@ -446,6 +530,11 @@ def ventaReporteCedula(pventana):
 # Reporte según código postal #
 ###############################
 def validarReporteCodigo(pventana, pcodigo, plistaCodDisp):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listaClientes = clientes()
     if pcodigo == -1:
         return mostrarError(pventana, "Por favor escoja un código")
@@ -453,8 +542,14 @@ def validarReporteCodigo(pventana, pcodigo, plistaCodDisp):
     return ""
     
 def entradasReporteCodigo(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     listaClientes = clientes()
     codigosActu = listaCodDirEspe(listaClientes)
+    codigosActu.sort()
     caja = crearCaja(pventana, "Códigos disponibles", tk.StringVar(), codigosActu, "center")
     caja.config(width=60)
     caja.set("- Códigos -")
@@ -462,6 +557,11 @@ def entradasReporteCodigo(pventana):
     boton = crearBoton(pventana, "Generar reporte", funcion)
 
 def ventanaReporteCodigo(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según código postal")
     ventana.lift(pventana)
@@ -471,6 +571,11 @@ def ventanaReporteCodigo(pventana):
 # Submenu de reportes #
 #######################
 def botonesMenuReportes(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     funcionProvincia = lambda: ventanaReporteProvincia(pventana)
     funcionCedula = lambda: ventaReporteCedula(pventana)
     funcionCodigo = lambda: ventanaReporteCodigo(pventana)
@@ -479,6 +584,11 @@ def botonesMenuReportes(pventana):
     botonCodigo = crearBoton(pventana, "Reporte según código", funcionCodigo)
 
 def subMenuReportes(pventana):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     ventana = tk.Toplevel(pventana)
     ventana.title("Menú de reportes")
     ventana.lift(pventana)
@@ -514,8 +624,6 @@ def validarCedulaCorreo(pventana, pcedula):
     enviarCorreo(lista[-1],lista[0])
     return mostrarInfo(pventana,'Se ha enviado Correo')
 
-        #return mostrarError(pventana,'El correo no se pudo enviar')
-
 def entradaEnviarCorreo(pventana):
     """
     F: ingresa a la ventana los botones y cajas de seleccion 
@@ -527,6 +635,11 @@ def entradaEnviarCorreo(pventana):
     botonIngresar = crearBoton(pventana, "Buscar Info", funcion)
 
 def abrirVentanaEnviarCorreo(pprincipal):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     ventana = tk.Toplevel(pprincipal)
     ventana.title('Enviar Correos')
     ventana.lift(pprincipal)    # Posiciona por encima de ventana principal
@@ -579,6 +692,11 @@ def colocarBotonesPrincipal(ventanaPrincipal):
     return botonCargarCodigos, botonRegistraCliente, botonInsertarClientes, botonCrearEtiqueta, botonEnviarCorreo, botonExportarCodigos, botonCrearReportes, botonCredenciales
 
 def activarBotones(pBotones,pdicBD = dicBD):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     activar2 = list(pBotones[:2]) + [pBotones[4]]
     for boton in pBotones:
         if pdicBD != {} and clientes() != []:
@@ -586,7 +704,7 @@ def activarBotones(pBotones,pdicBD = dicBD):
         elif pdicBD != {} and clientes()==[]:
             for boton2 in activar2:
                 boton2.config(state="normal")
-                return ""
+            return ""
         else:
             boton.config(state="disabled")
     return ""
@@ -602,6 +720,11 @@ def activarBoton(pdatos):
     return "disabled"
 
 def configPrincipal(pventana, pbotones):
+    """
+    Función:
+    Entradas:
+    Salidas:
+    """
     funcionActivar = lambda: activarBotones(pbotones[1:-1])
     funcionCodPostales = lambda: (abrirVentanaCargarCodigos(pventana, pbotones[0], funcionActivar), cargarCodPostales())
     funcionCredenciales = lambda: abrirVentanaCredenciales(pventana)
@@ -626,29 +749,7 @@ def iniciarInterfaz():
     miLabel = Label(ventanaPrincipal, image=frase, background="#d9d9d9").pack()
     configPrincipal(ventanaPrincipal, colocarBotonesPrincipal(ventanaPrincipal))
     ventanaPrincipal.mainloop()
+############################
+#    Programa Principal    # 
+############################
 iniciarInterfaz()
-#import tkinter
-#from tkinter import ttk
-#
-#root = tkinter.Tk()
-#style = ttk.Style()
-#style.map("C.TButton",
-#    foreground=[('pressed', 'green'), ('active', 'black')],
-#    background=[('pressed', '!disabled', 'green'), ('active', 'green')])
-#colored_btn = ttk.Button(text="Test", style="C.TButton")
-#colored_btn.pack()
-#colored_btn.config(width=55)
-#
-#root.mainloop()
-#from tkinter import ttk
-#import tkinter
-#
-#root = tkinter.Tk()
-#
-#ttk.Style().configure("TButton", padding=6, relief="flat",
-#   background="blue")
-#
-#btn = ttk.Button(text="Sample")
-#btn.pack()
-#
-#root.mainloop()
