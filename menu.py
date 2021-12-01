@@ -155,9 +155,9 @@ def confirmarTk(pventana, pmensaje):
 ########################################### Cargar códigos ##################################################    
 def cargarCodPostales():
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Carga los códigos postales
+    Entradas:N/A
+    Salidas: Dic
     """
     dicBD.update(crearBDCodigos())
     return dicBD
@@ -178,9 +178,9 @@ def abrirVentanaCargarCodigos(pventana, pboton, pfuncion):
 ########################################### Insertar cliente ##################################################    
 def validarEstado(pcombo, pcomboNext):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Válida el estado de las combobox
+    Entradas:Pcombo(combobox),pcombonext(combobox)
+    Salidas: N/A
     """
     if pcombo.get() == "— Provincias —" or pcombo.get()=="— Cantones Disponibles —":
         pcomboNext.config(state="disabled")
@@ -216,8 +216,8 @@ def deProvinciaACantonAux(pprovincia, pcanton, pcombo):
 ########################################### Insertar cliente ##################################################    
 def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pcorreo, pfuncion):
     """
-    Función:
-    Entradas:
+    Función:Valida el registrar cliente
+    Entradas:pvemtana(ventana),pcedula,pnombre,pespe,pprovin,pcan,pdis,pcorreo(str),pfuncion(funcion)
     Salidas:
     """
     listaGen = [pprovin,pcan,pdis]
@@ -260,8 +260,8 @@ def validarRegistrarCliente(pventana, pcedula,pnombre,pespe,pprovin,pcan,pdis,pc
 
 def asignarPls(pentrada, pprov, pcan, pdis):
     """
-    Función:
-    Entradas:
+    Función:Asigna el set a la entrada(lo rellena de tecto)
+    Entradas:pentrada(entry),pprov(str),pcan(str),pdis(pdis(str))
     Salidas:
     """
     a = StringVar(value=conseguirCodigo(dicBD, pprov.get(), pcan.get(), pdis.get()))
@@ -331,9 +331,9 @@ def abrirVentanaIngresarCliente(pventana, pfuncion):
 ########################################### Ventana crear clientes ##################################################    
 def validarRegistrarClientes(pventana, pnum, pfuncion):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Calida la ventana de registrar clientes
+    Entradas:pventana(ventana),pnum(int),pfunción(función)
+    Salidas: Mostrar la información una ventana
     """
     listaClientes, dicCodigos, pnum = clientes(), dicBD, esEntero(pnum)
     if pnum == None:
@@ -346,8 +346,8 @@ def validarRegistrarClientes(pventana, pnum, pfuncion):
 
 def entradasRegistrarClientes(pventana, pfuncion):
     """
-    Función:
-    Entradas:
+    Función: es la ventana registrar clientes 
+    Entradas:pventana(ventana),pfuncion (una función)
     Salidas:
     """
     cantidadClientes = crearEntradaTexto(pventana, "Cantidad de clientes: ", tk.IntVar(), "center")
@@ -370,9 +370,9 @@ def menuRegistrarClientes(pprincipal, pfuncion):
 ###########################################   exportar   ##################################################
 def exportarXML():
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Exports el Archivo XML
+    Entradas:N/A
+    Salidas:error o vacío
     """
     try:
         dicCodigos = dicBD
@@ -386,8 +386,8 @@ def exportarXML():
 ###########################
 def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
     """
-    Función:
-    Entradas:
+    Función:Válida el reporte de la provincia
+    Entradas:pventana(ventana),pprovincia(str),pprovinciasTotales(lista)
     Salidas:
     """
     listaClientes = clientes()
@@ -397,9 +397,9 @@ def validarReporteProvincia(pventana, pprovincia, pprovinciasTotales):
 
 def entradasReporteProvincia(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Hace los reportes de provincia para ingresarlos en la vemtana
+    Entradas: pventana(ventana)
+    Salidas:N/A
     """
     listClientes = clientes()
     provincias = crearListProvDisp(listClientes)
@@ -411,9 +411,9 @@ def entradasReporteProvincia(pventana):
     
 def ventanaReporteProvincia(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: hace la ventana de reporte de provincia
+    Entradas: Pventana(ventana)
+    Salidas:N/A
     """
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según provincia")
@@ -435,9 +435,9 @@ def asignarNombre(pcedula):
 
 def rellenarEntradasEtiqueta(pventana, pentradaGen, pentradaEspe, pentradaCod, pcedula):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Rellena las entradas de la etiqueta
+    Entradas: la pventana(ventana) pentrada(entry) , pentradaEspe(entry), pcedula(Str)
+    Salidas: Ventana o entrys
     """
     try:
         tupla = deCedulaATupla(clientes(),pcedula)
@@ -453,9 +453,9 @@ def rellenarEntradasEtiqueta(pventana, pentradaGen, pentradaEspe, pentradaCod, p
         
 def generarEtiquetaTK(pventana, pcedula, pdirGen, pdirEspe, pcodigo):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Genera etiqueta y cierra la ventana
+    Entradas: Pventana,pcedula(str),pdir(str),pdirEspe(str),pcodigo(str)
+    Salidas: ventana o vacío
     """
     try:
         nombre = mostrarNombreCliente(deCedulaATupla(clientes(), pcedula)[0])
@@ -492,9 +492,9 @@ def entradasEtiqueta(pventana):
 ###########################
 def validarReporteCedula(pventana, pcedula):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Válida el reporte de la cédula
+    Entradaspventana(ventana),pcedula(str)
+    Salidas:ventana o crea reporte de cliente(funcion)
     """
     listaClientes = clientes()
     pcedula = validarCedula(pcedula)
@@ -506,9 +506,9 @@ def validarReporteCedula(pventana, pcedula):
 
 def entradasReporteCedula(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Son las entradas que se ponen en la ventana e3 reporte cédula
+    Entradas:pventana(ventana)
+    Salidas:N/A
     """
     cedula = crearEntradaTexto(pventana, "Ingrese la cédula", tk.StringVar(), "center")
     funcion = lambda: validarReporteCedula(pventana, cedula.get())
@@ -516,9 +516,9 @@ def entradasReporteCedula(pventana):
 
 def ventaReporteCedula(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Ventana de rporte cédula
+    Entradas: pventana(ventana)
+    Salidas:N/A
     """
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según cédula")
@@ -531,9 +531,9 @@ def ventaReporteCedula(pventana):
 ###############################
 def validarReporteCodigo(pventana, pcodigo, plistaCodDisp):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Válida el reporte del código
+    Entradas:pventana(ventana),pcodigo(str),plistaCodDisp(list)
+    Salidas:N/A
     """
     listaClientes = clientes()
     if pcodigo == -1:
@@ -543,9 +543,9 @@ def validarReporteCodigo(pventana, pcodigo, plistaCodDisp):
     
 def entradasReporteCodigo(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Entradas la ventana reporte código
+    Entradas: pventana(ventana)
+    Salidas:N/A
     """
     listaClientes = clientes()
     codigosActu = listaCodDirEspe(listaClientes)
@@ -558,9 +558,9 @@ def entradasReporteCodigo(pventana):
 
 def ventanaReporteCodigo(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Ventana Reporte código
+    Entradas:pventana(ventana)
+    Salidas:N/A
     """
     ventana = tk.Toplevel(pventana)
     ventana.title("Reporte según código postal")
@@ -572,9 +572,9 @@ def ventanaReporteCodigo(pventana):
 #######################
 def botonesMenuReportes(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Son los botones del mennú reportes son para colocarlos en ventana
+    Entradas:pventana(ventana)
+    Salidas:N/A
     """
     funcionProvincia = lambda: ventanaReporteProvincia(pventana)
     funcionCedula = lambda: ventaReporteCedula(pventana)
@@ -585,9 +585,9 @@ def botonesMenuReportes(pventana):
 
 def subMenuReportes(pventana):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:es la ventana del submenú de los reportes
+    Entradas:pventana(ventana)
+    Salidas:N/A
     """
     ventana = tk.Toplevel(pventana)
     ventana.title("Menú de reportes")
@@ -636,9 +636,9 @@ def entradaEnviarCorreo(pventana):
 
 def abrirVentanaEnviarCorreo(pprincipal):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Abre la ventana de enviar correo
+    Entradas:pprincipal(ventana)
+    Salidas:N/A
     """
     ventana = tk.Toplevel(pprincipal)
     ventana.title('Enviar Correos')
@@ -693,9 +693,9 @@ def colocarBotonesPrincipal(ventanaPrincipal):
 
 def activarBotones(pBotones,pdicBD = dicBD):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Activa los botones según corresponda
+    Entradas:Pbotones(buttons),pdicBD(dic)
+    Salidas:N/A
     """
     activar2 = list(pBotones[:2]) + [pBotones[4]]
     for boton in pBotones:
@@ -721,9 +721,9 @@ def activarBoton(pdatos):
 
 def configPrincipal(pventana, pbotones):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Desactiva los botones y se conecta con el menú rpincipal
+    Entradas:pventana(ventana),pbotones(buttons)
+    Salidas:N/A
     """
     funcionActivar = lambda: activarBotones(pbotones[1:-1])
     funcionCodPostales = lambda: (abrirVentanaCargarCodigos(pventana, pbotones[0], funcionActivar), cargarCodPostales())

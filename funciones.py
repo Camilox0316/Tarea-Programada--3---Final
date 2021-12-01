@@ -137,9 +137,9 @@ def validarDirEspecifica(string):
 
 def validar60(pdirEspe):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Valida la direccion específica
+    Entradas:PdirEspe(str)
+    Salidas: str
     """
     pdirEspe = pdirEspe.split()
     if not len(pdirEspe) == 3:
@@ -277,17 +277,17 @@ def generarCodPostal_DirGeneral(pdictBD, pcedula):
 
 def esTildeONN(pletra):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Ve si una letra tiene tilde
+    Entradas: letra (str)
+    Salidas:Bool
     """
     return pletra in "áéíóúñ"
 
 def sustituirTildes(ppalabra):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Sustituye las tildes de un apalabras y tambien caracteres
+    Entradas:ppalabra(str)
+    Salidas:PalbaraN(str)
     """
     dicc = {"á": "a", "é": "e", "í":"i", "ó":"o", "ú": "u", "ñ":"nn"}
     palabraN = ""
@@ -299,9 +299,9 @@ def sustituirTildes(ppalabra):
 
 def sustituirTildesAux(ptupla):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Sustituye las tildes 
+    Entradas:Ptupla(tuple)
+    Salidas:Ventana
     """
     listaN = []
     for nombre in ptupla:
@@ -347,9 +347,9 @@ def encontrarCedula(pcedula, plistaBD):
 
 def crearListCodDisponibles(plistaObjetos):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Crea la lista de los códigos que existen
+    Entradas: PlistaObjetos(lista)
+    Salidas:lista(list)
     """
     lista = []
     for cliente in plistaObjetos:
@@ -360,9 +360,9 @@ def crearListCodDisponibles(plistaObjetos):
 
 def crearListProvDisp(plistaObjetos):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:crea una lista de las provinxias disponibles
+    Entradas:plistaObjetos(list)
+    Salidas:lista(lista)
     """
     lista = []
     for cliente in plistaObjetos:
@@ -376,9 +376,9 @@ def crearListProvDisp(plistaObjetos):
 ####################################
 def crearClientes(pcantidad, plistaBD, pdiccCodigos):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Crea Clientes dinamicamente
+    Entradas:pcantidad(int),plistaBD(lista),pdiccCodigos(dic)
+    Salidas: plistaBD(list)
     """
     while pcantidad != 0:
         cedula = crearCedula()
@@ -416,9 +416,9 @@ def enviarCorreo(correo,nombre):
 
 def listaCedNom(plista):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función:Hace una lista de las cédulas y nombre
+    Entradas: plista(list)
+    Salidas:lista(list)
     """
     lista = []
     for cliente in plista:
@@ -428,9 +428,9 @@ def listaCedNom(plista):
 
 def listaCodDirEspe(plistaObjetos):
     """
-    Función:
-    Entradas:
-    Salidas:
+    Función: Hace una lista de dirección específica
+    Entradas: lista de objetos(list)
+    Salidas:lista(list)
     """
     lista = []
     for cliente in plistaObjetos:
